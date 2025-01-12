@@ -27,7 +27,8 @@ export default function GroupPage() {
       try {
         setLoading(true);
         setError(null);
-
+        console.log(objectives)
+        console.log(updates)
         // Obtener los datos del grupo, miembros, objetivos y actualizaciones
         const [groupData, membersData, objectivesData, updatesData] = await Promise.all([
           getGroupsFromDB(),
