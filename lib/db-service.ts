@@ -434,12 +434,16 @@ export const dbService = {
 
     if (objectiveError) throw objectiveError;
 
-    // Luego, inserta los resultados clave
-    const keyResultsInsertions = keyResults.map((result:any) => ({
-      objective_id: objectiveData.id, // Usa el ID del objetivo creado
-      description: result,
+    type KeyResult = {
+      description: string;
+      // Add other properties here as needed
+    };
+    
+    const keyResultsInsertions = keyResults.map((result: KeyResult) => ({
+      objective_id: objectiveData.id,
+      description: result.description,
     }));
-
+    
     const { error: keyResultsError } = await supabase
       .from('key_results')
       .insert(keyResultsInsertions);

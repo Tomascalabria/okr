@@ -46,11 +46,23 @@ export function GroupMembers({ groupId, groupName, inviteCode }: GroupMembersPro
     const loadData = async () => {
       try {
         const [membersData, roleData] = await Promise.all([
-          dbService.getGroupMembers(groupId),
+          dbService.getGroupMembers(groupId), 
           dbService.getUserRole(groupId)
         ])
 
-        const formattedMembersData = membersData.map((member: any) => ({
+        // Asumiendo que la respuesta de dbService.getGroupMembers es de tipo GroupMember[]
+        interface MemberProfile {
+          name: string;
+          avatar_url: string | null;
+        }
+        
+        interface MemberData {
+          user_id: string;
+          role: string;
+          profiles: MemberProfile | MemberProfile[];  // Profiles can be an object or an array
+        }
+        
+        const formattedMembersData = membersData.map((member: MemberData) => ({
           user_id: member.user_id,
           role: member.role,
           profiles: {
@@ -58,7 +70,6 @@ export function GroupMembers({ groupId, groupName, inviteCode }: GroupMembersPro
             avatar_url: Array.isArray(member.profiles) ? member.profiles[0]?.avatar_url || null : member.profiles.avatar_url,
           },
         }));
-        
                 setMembers(formattedMembersData)
         setUserRole(roleData)
       } catch (error) {
@@ -230,4 +241,4 @@ export function GroupMembers({ groupId, groupName, inviteCode }: GroupMembersPro
       </Dialog>
     </div>
   )
-} 
+}

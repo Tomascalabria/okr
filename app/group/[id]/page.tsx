@@ -14,17 +14,16 @@ export default function GroupPage() {
   const { id: groupId } = useParams();
 
   const [group, setGroup] = useState<Group | null>(null);
-  const [groupMembers, setGroupMembers] = useState<GroupMember[]>([]);  
-  const [objectives, setObjectives] = useState<(Objective & { key_results: KeyResult[] })[]>([]);  
-  const [updates, setUpdates] = useState<ProgressUpdate[]>([]);  
+  const [groupMembers, setGroupMembers] = useState<GroupMember[]>([]);
+  const [objectives, setObjectives] = useState<(Objective & { key_results: KeyResult[] })[]>([]);
+  const [updates, setUpdates] = useState<ProgressUpdate[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadGroupData = async () => {
       if (!groupId) return;
-      console.log(objectives)
-      console.log(updates)
+
       try {
         setLoading(true);
         setError(null);
@@ -34,7 +33,7 @@ export default function GroupPage() {
           getGroupsFromDB(),
           getGroupMembers(groupId),
           getGroupObjectives(groupId),
-          getGroupUpdates(groupId), // <-- Fixed missing comma here
+          getGroupUpdates(groupId),
         ]);
 
         setGroup(groupData);
@@ -43,7 +42,7 @@ export default function GroupPage() {
           const memberObjectives = objectivesData.filter((obj) => obj.created_by === member.user_id);
           return { ...member, objectives: memberObjectives };
         });
-      
+
         setGroupMembers(membersWithObjectives);
         setObjectives(
           objectivesData.map((obj) => ({
@@ -61,7 +60,7 @@ export default function GroupPage() {
     };
 
     loadGroupData();
-  }, [groupId]);
+  }, [groupId]); // Solo 'groupId' como dependencia
 
   if (loading) {
     return <div>Cargando...</div>;
@@ -76,20 +75,18 @@ export default function GroupPage() {
   }
 
   const hasAnyOKRs = groupMembers.some((member) => member.objectives && member.objectives.length > 0);
-  console.log(group.name)
+
   return (
     <div className="container max-w-5xl mx-auto py-6">
-    {/* Título, descripción y CreateOKRDialog */}
-    <div className="mb-8 flex flex-col items-start">
-      <div className="flex justify-between w-full items-center">
-        <div>
-          
-          <h1 className="text-2xl font-bold">{group[0].name}</h1>
-          <p className="text-sm text-muted-foreground">{group[0].description}</p>
+      {/* Título, descripción y CreateOKRDialog */}
+      <div className="mb-8 flex flex-col items-start">
+        <div className="flex justify-between w-full items-center">
+          <div>
+            <h1 className="text-2xl font-bold">{group[0].name}</h1>
+            <p className="text-sm text-muted-foreground">{group[0].description}</p>
+          </div>
+          <CreateOKRDialog groups={group} />
         </div>
-        <CreateOKRDialog groups={group} />
-      </div>
-
       </div>
 
       {/* Mensaje si no hay OKRs */}
@@ -121,7 +118,7 @@ export default function GroupPage() {
                         objective={{
                           title: objective.title,
                           progress: objective.progress,
-                          keyResults: objective.key_results || [], 
+                          keyResults: objective.key_results || [],
                         }}
                       />
                     </div>
@@ -140,4 +137,3 @@ export default function GroupPage() {
     </div>
   );
 }
-
