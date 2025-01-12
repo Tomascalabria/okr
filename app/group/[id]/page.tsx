@@ -2,10 +2,10 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
-import { OKRCard } from "../../../components/okr-card";
+import { OKRCard } from "@/components/okr-card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { getGroupMembers, getGroupsFromDB } from "@/utils/db";
-import type { Group, GroupMember, KeyResult } from "@/types/database";
+import type { Group, GroupMember } from "@/types/database";
 
 // Importa el CreateOKRDialog (asegúrate de que el componente esté correctamente exportado)
 import { CreateOKRDialog } from "@/components/create-okr-dialog";
