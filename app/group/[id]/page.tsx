@@ -8,13 +8,11 @@ import { OKRCard } from "../../../components/okr-card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { getGroupMembers, getGroupObjectives, getGroupUpdates, getGroupsFromDB } from "@/utils/db";
 import type { Group, GroupMember, Objective, KeyResult, ProgressUpdate } from "@/types/database";
-
-// Importa el CreateOKRDialog (asegúrate de que el componente esté correctamente exportado)
 import { CreateOKRDialog } from "@/components/create-okr-dialog";
 
 export default function GroupPage() {
   const { id } = useParams();
-  const groupId = Array.isArray(id) ? id[0] : id;
+  const groupId = id ? (Array.isArray(id) ? id[0] : id) : null;
 
   const [group, setGroup] = useState<Group | null>(null);
   const [groupMembers, setGroupMembers] = useState<GroupMember[]>([]);
@@ -30,8 +28,7 @@ export default function GroupPage() {
       try {
         setLoading(true);
         setError(null);
-        
-        // Obtener los datos del grupo, miembros, objetivos y actualizaciones
+
         const [groupData, membersData, objectivesData, updatesData] = await Promise.all([
           getGroupsFromDB(),
           getGroupMembers(groupId),
@@ -39,7 +36,7 @@ export default function GroupPage() {
           getGroupUpdates(groupId),
         ]);
 
-        setGroup(groupData);
+        setGroup(groupData[0] || null);
 
         const membersWithObjectives = membersData.map((member) => {
           const memberObjectives = objectivesData.filter((obj) => obj.created_by === member.user_id);
@@ -63,7 +60,7 @@ export default function GroupPage() {
     };
 
     loadGroupData();
-  }, [groupId]); // Solo 'groupId' como dependencia
+  }, [groupId]);
 
   if (loading) {
     return <div>Cargando...</div>;
@@ -81,18 +78,16 @@ export default function GroupPage() {
 
   return (
     <div className="container max-w-5xl mx-auto py-6">
-      {/* Título, descripción y CreateOKRDialog */}
       <div className="mb-8 flex flex-col items-start">
         <div className="flex justify-between w-full items-center">
           <div>
-            <h1 className="text-2xl font-bold">{group[0].name}</h1>
-            <p className="text-sm text-muted-foreground">{group[0].description}</p>
+            <h1 className="text-2xl font-bold">{group.name}</h1>
+            <p className="text-sm text-muted-foreground">{group.description}</p>
           </div>
-          <CreateOKRDialog groups={group} />
+          <CreateOKRDialog groups={[group]} />
         </div>
       </div>
 
-      {/* Mensaje si no hay OKRs */}
       {!hasAnyOKRs ? (
         <div className="py-4 px-6 bg-muted/50 rounded-lg text-sm text-muted-foreground">
           No hay OKRs definidos aún en este grupo.
@@ -101,18 +96,18 @@ export default function GroupPage() {
         <div className="space-y-8">
           {groupMembers.map((member) => (
             <div key={member.user_id}>
-              {/* Miembro del grupo */}
               <div className="flex items-center gap-3 mb-2">
                 <Avatar>
                   <AvatarImage src={member.profile?.avatar_url || ""} />
                   <AvatarFallback>
-                    {member.profile?.name.split(" ").map((n) => n[0]).join("")}
+                    {member.profile?.name
+                      ? member.profile.name.split(" ").map((n) => n[0]).join("")
+                      : "?"}
                   </AvatarFallback>
                 </Avatar>
                 <span className="font-medium">{member.profile?.name}</span>
                 <span className="text-sm text-muted-foreground">{member.role}</span>
               </div>
-              {/* OKRs del miembro */}
               {member.objectives && member.objectives.length > 0 ? (
                 <div className="grid sm:grid-cols-2 gap-4">
                   {member.objectives.map((objective) => (
