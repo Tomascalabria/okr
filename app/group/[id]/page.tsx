@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
-import { OKRCard } from "@/components/okr-card";
+import { OKRCard } from "../../../components/okr-card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { getGroupMembers, getGroupsFromDB } from "@/utils/db";
 import type { Group, GroupMember } from "@/types/database";
@@ -35,7 +35,9 @@ export default function GroupPage() {
           getGroupMembers(groupIdString), // Usamos groupIdString aquí
         ]);
 
-        setGroup(groupData);
+        // Verifica si hay grupos y usa el primero en caso de que haya más de uno
+        const group = groupData.length > 0 ? groupData[0] : null;
+        setGroup(group);
 
         const membersWithObjectives = membersData.map((member) => {
           const memberObjectives = groupData.flatMap((group) =>
@@ -76,8 +78,8 @@ export default function GroupPage() {
       <div className="mb-8 flex flex-col items-start">
         <div className="flex justify-between w-full items-center">
           <div>
-            <h1 className="text-2xl font-bold">{group[0].name}</h1>
-            <p className="text-sm text-muted-foreground">{group[0].description}</p>
+            <h1 className="text-2xl font-bold">{group.name}</h1>
+            <p className="text-sm text-muted-foreground">{group.description}</p>
           </div>
           <CreateOKRDialog groups={group} />
         </div>
