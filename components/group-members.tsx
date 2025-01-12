@@ -58,6 +58,7 @@ export function GroupMembers({ groupId, groupName, inviteCode }: GroupMembersPro
             avatar_url: Array.isArray(member.profiles) ? member.profiles[0]?.avatar_url || null : member.profiles.avatar_url,
           },
         }));
+        
                 setMembers(formattedMembersData)
         setUserRole(roleData)
       } catch (error) {

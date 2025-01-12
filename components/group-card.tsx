@@ -54,13 +54,18 @@ export function GroupCard({ group, isActive, onClick }: GroupCardProps) {
       toast.success(`Has salido del grupo ${group.name}`)
       router.refresh()
       router.push("/")
-    } catch (error: any) {
-      toast.error(error.message)
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message)
+      } else {
+        toast.error("Error desconocido al salir del grupo")
+      }
     } finally {
       setIsLeaving(false)
       setShowLeaveDialog(false)
     }
   }
+  
 
   return (
     <>

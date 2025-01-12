@@ -3,10 +3,7 @@ import type { Group, Objective, KeyResult, ProgressUpdate } from '@/types/databa
 
 export const dbService = {
   // Grupos
-  async createGroup(name: string, description: string) {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('No authenticated user')
-
+  async createGroup(name: string, description: string): Promise<Group> {
     const { data, error } = await supabase
       .from('groups')
       .insert({
@@ -14,20 +11,10 @@ export const dbService = {
         description,
       })
       .select()
-      .single()
-
-    if (error) throw new Error('Error al crear el grupo')
-
-    // Añadir el creador como miembro del grupo
-    await supabase
-      .from('group_members')
-      .insert({
-        group_id: data.id,
-        user_id: user.id,
-        role: 'admin'
-      })
-
-    return data
+      .single();
+  
+    if (error) throw new Error('Error al crear el grupo');
+    return data as Group;
   },
 
   async getUserGroups() {

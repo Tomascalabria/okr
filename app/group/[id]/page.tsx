@@ -23,7 +23,8 @@ export default function GroupPage() {
   useEffect(() => {
     const loadGroupData = async () => {
       if (!groupId) return;
-
+      console.log(objectives)
+      console.log(updates)
       try {
         setLoading(true);
         setError(null);
@@ -139,3 +140,4 @@ export default function GroupPage() {
     </div>
   );
 }
+

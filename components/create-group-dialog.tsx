@@ -40,7 +40,7 @@ export function CreateGroupDialog({ isOpen, onClose, onGroupCreated }: CreateGro
     setLoading(true)
 
     try {
-      const newGroup = await dbService.createGroupWithInviteCode(
+   await dbService.createGroupWithInviteCode(
         formData.name,
         formData.description
       )
@@ -49,9 +49,16 @@ export function CreateGroupDialog({ isOpen, onClose, onGroupCreated }: CreateGro
       onGroupCreated() // Fetch updated groups after creation
       onClose()
       setFormData({ name: "", description: "" })
-    } catch (error: any) {
-      console.error("Error creating group:", error)
-      toast.error(error.message || "Error al crear el grupo")
+    } 
+    catch (error: unknown) {
+      // Type narrow the error to ensure it's an instance of Error
+      if (error instanceof Error) {
+        console.error("Error creating group:", error)
+        toast.error(error.message || "Error al crear el grupo")
+      } else {
+        console.error("Unknown error:", error)
+        toast.error("Error desconocido al crear el grupo")
+      }
     } finally {
       setLoading(false)
     }
