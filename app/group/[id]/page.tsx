@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
@@ -32,8 +32,8 @@ export default function GroupPage() {
         const [groupData, membersData, objectivesData, updatesData] = await Promise.all([
           getGroupsFromDB(),
           getGroupMembers(groupId),
-          getGroupObjectives(groupI
-          getGroupUpdates(groupId),
+          getGroupObjectives(groupId),
+          getGroupUpdates(groupId), // <-- Fixed missing comma here
         ]);
 
         setGroup(groupData);
@@ -120,7 +120,7 @@ export default function GroupPage() {
                         objective={{
                           title: objective.title,
                           progress: objective.progress,
-                          keyResults: objective.key_results || [],
+                          keyResults: objective.key_results || [], 
                         }}
                       />
                     </div>
