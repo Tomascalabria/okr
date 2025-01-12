@@ -6,7 +6,6 @@ import { dbService } from "@/lib/db-service";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import Head from "next/head"; // Import the Head component
-import { group } from "console";
 
 export default function JoinGroupPage({ params }: { params: { code: string } }) {
   const router = useRouter();
@@ -43,8 +42,8 @@ export default function JoinGroupPage({ params }: { params: { code: string } }) 
       <Head>
         <title>Join Group Invitation</title>
         <meta
-          name="Hola!"
-          content={`${user.name} invitando a cargar tus objetivos en ${group.name}`}
+          name="description"
+          content={`¡Hola! ${user?.name || "Usuario"} te ha invitado a cargar tus objetivos.`}
         />
         <meta name="robots" content="noindex, nofollow" />
       </Head>
