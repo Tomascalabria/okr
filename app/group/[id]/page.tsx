@@ -13,7 +13,8 @@ import type { Group, GroupMember, Objective, KeyResult, ProgressUpdate } from "@
 import { CreateOKRDialog } from "@/components/create-okr-dialog";
 
 export default function GroupPage() {
-  const { id: groupId } = useParams();
+  const { id } = useParams();
+  const groupId = Array.isArray(id) ? id[0] : id;
 
   const [group, setGroup] = useState<Group | null>(null);
   const [groupMembers, setGroupMembers] = useState<GroupMember[]>([]);
