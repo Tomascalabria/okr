@@ -23,8 +23,9 @@ export function InviteLink({ groupId }: InviteLinkProps) {
       setInviteLink(link)
       navigator.clipboard.writeText(link)
       toast.success("Enlace de invitación copiado al portapapeles")
-    } catch (error) {
-      toast.error("Error al generar el enlace de invitación")
+    } catch (error:any) {
+      toast.error(`Error al generar el enlace de invitación: ${error.message}`)
+
     } finally {
       setLoading(false)
     }

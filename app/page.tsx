@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { LogOut, Plus } from 'lucide-react'
+import { LogOut } from 'lucide-react'
 import { dbService } from "@/lib/db-service"
 import { CreateGroupDialog } from "@/components/create-group-dialog"
 import { GroupCard } from "../components/group-card"

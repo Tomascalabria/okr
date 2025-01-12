@@ -26,11 +26,18 @@ export default function JoinGroupPage({ params }: { params: { code: string } }) 
         await dbService.joinGroupWithCode(params.code);
         toast.success("¡Te has unido al grupo exitosamente!");
         router.push("/");
-      } catch (error: any) {
-        console.error("Error joining group:", error); // Debug log
-        toast.error(error.message);
+      }
+      catch (error: unknown) {
+        if (error instanceof Error) {
+          console.error("Error joining group:", error); // Debug log
+          toast.error(error.message);
+        } else {
+          console.error("An unknown error occurred");
+          toast.error("Ha ocurrido un error inesperado.");
+        }
         router.push("/");
       }
+      
     };
 
     handleJoinGroup();

@@ -2,11 +2,8 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type { Objective, ProgressUpdate } from "@/types/database"
 import {
-  LineChart,
-  Line,
   PieChart,
   Pie,
   Cell,
@@ -30,6 +27,7 @@ export function GroupDashboard({ groupName, objectives, updates }: GroupDashboar
     return acc + (objProgress / (obj.key_results?.length || 1))
   }, 0) / (objectives.length || 1)
 
+
   const pieData = [
     { name: "Completado", value: overallProgress },
     { name: "Pendiente", value: 100 - overallProgress },
@@ -42,7 +40,7 @@ export function GroupDashboard({ groupName, objectives, updates }: GroupDashboar
       <div className="grid md:grid-cols-3 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Progreso General</CardTitle>
+            <CardTitle> { `Progreso General ${groupName} `}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[200px]">

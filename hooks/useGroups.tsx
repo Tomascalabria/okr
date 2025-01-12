@@ -4,7 +4,7 @@ import { getGroupMembers } from "@/utils/db";
 import { getGroupsFromDB } from "@/utils/db";
 import { useState, useEffect } from "react";
 
-export function useGroupData(groupId) {
+export function useGroupData(groupId:any) {
   const [group, setGroup] = useState(null);
   const [groupMembers, setGroupMembers] = useState([]);
   const [objectives, setObjectives] = useState([]);

@@ -32,7 +32,7 @@ export default function GroupPage() {
         const [groupData, membersData, objectivesData, updatesData] = await Promise.all([
           getGroupsFromDB(),
           getGroupMembers(groupId),
-          getGroupObjectives(groupId),
+          getGroupObjectives(groupI
           getGroupUpdates(groupId),
         ]);
 

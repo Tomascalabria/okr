@@ -22,7 +22,6 @@ export function LoginForm({
 }: React.ComponentPropsWithoutRef<"div">) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -39,13 +38,20 @@ export function LoginForm({
       setTimeout(() => {
         window.location.href = '/'
       }, 500)
-    } catch (error: any) {
-      setError(
-        error.message === "Invalid login credentials"
-          ? "Credenciales inválidas. Por favor verifica tu email y contraseña."
-          : "Ocurrió un error al iniciar sesión. Por favor intenta de nuevo."
-      )
-      toast.error(error.message)
+    } catch (err) {
+      if (err instanceof Error) {
+        // Manejo del error con un tipo seguro
+        setError(
+          err.message === "Invalid login credentials"
+            ? "Credenciales inválidas. Por favor verifica tu email y contraseña."
+            : "Ocurrió un error al iniciar sesión. Por favor intenta de nuevo."
+        )
+        toast.error(err.message)
+      } else {
+        // Mensaje genérico si el error no es una instancia de Error
+        setError("Ocurrió un error inesperado.")
+        toast.error("Error inesperado.")
+      }
     } finally {
       setLoading(false)
     }

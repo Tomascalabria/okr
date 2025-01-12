@@ -21,11 +21,13 @@ export interface Group {
 }
 
 export interface GroupMember {
-  group_id: string
-  user_id: string
-  role: 'admin' | 'member'
-  created_at: string
+  user_id: string;
+  role: string;
+  name: string; // From the profiles table
+  avatar_url?: string; // From the profiles table
+  objectives?: Objective[]; // Optional, populated post-fetch
 }
+
 
 export interface KeyResult {
   id: string

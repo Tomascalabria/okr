@@ -12,7 +12,8 @@ import {
 } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { ThumbsUp, ThumbsDown } from 'lucide-react'
-import { ProgressUpdate, ProgressValidation } from "../types/progress"
+import { ProgressUpdate } from "../types/progress"
+// import { ProgressValidation } from "../types/progress"
 
 interface ProgressValidationProps {
   update: ProgressUpdate
@@ -38,7 +39,7 @@ export function ProgressValidationComponent({ update, onValidate }: ProgressVali
   }
 
   const userValidation = update.validations.find(v => v.userId === "current-user")
-  const validationCount = update.validations.length
+  // const validationCount = update.validations.length
 
   return (
     <div className="flex items-center gap-4">

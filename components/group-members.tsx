@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { dbService } from "@/lib/db-service"
-import { Users, Copy, UserPlus, LogOut, Trash2 } from "lucide-react"
+import { Copy, UserPlus, LogOut } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 interface GroupMember {
@@ -35,7 +35,6 @@ interface GroupMembersProps {
 export function GroupMembers({ groupId, groupName, inviteCode }: GroupMembersProps) {
   const router = useRouter()
   const [members, setMembers] = useState<GroupMember[]>([])
-  const [loading, setLoading] = useState(true)
   const [showInviteDialog, setShowInviteDialog] = useState(false)
   const [showLeaveDialog, setShowLeaveDialog] = useState(false)
   const [leavingGroup, setLeavingGroup] = useState(false)
@@ -49,25 +48,22 @@ export function GroupMembers({ groupId, groupName, inviteCode }: GroupMembersPro
         const [membersData, roleData] = await Promise.all([
           dbService.getGroupMembers(groupId),
           dbService.getUserRole(groupId)
-        ]);
+        ])
 
-        const formattedMembersData = membersData.map(member => ({
+        const formattedMembersData = membersData.map((member: any) => ({
           user_id: member.user_id,
           role: member.role,
           profiles: {
-            name: member.profiles.name,
-            avatar_url: member.profiles.avatar_url || null,
+            name: Array.isArray(member.profiles) ? member.profiles[0]?.name || '' : member.profiles.name,
+            avatar_url: Array.isArray(member.profiles) ? member.profiles[0]?.avatar_url || null : member.profiles.avatar_url,
           },
         }));
-
-        setMembers(formattedMembersData);
-        setUserRole(roleData);
+                setMembers(formattedMembersData)
+        setUserRole(roleData)
       } catch (error) {
-        console.error("Error loading data:", error);
-      } finally {
-        setLoading(false);
+        console.error("Error loading data:", error)
       }
-    };
+    }
 
     loadData()
   }, [groupId])
@@ -85,8 +81,9 @@ export function GroupMembers({ groupId, groupName, inviteCode }: GroupMembersPro
       toast.success("Has salido del grupo exitosamente")
       router.refresh()
       router.push("/")
-    } catch (error: any) {
-      toast.error(error.message)
+    } catch (error: unknown) {
+      const errorMessage = (error as Error).message || "Error desconocido al salir del grupo"
+      toast.error(errorMessage)
     } finally {
       setLeavingGroup(false)
       setShowLeaveDialog(false)
@@ -100,8 +97,9 @@ export function GroupMembers({ groupId, groupName, inviteCode }: GroupMembersPro
       toast.success("Has dejado el grupo exitosamente")
       router.refresh()
       router.push("/")
-    } catch (error: any) {
-      toast.error(error.message)
+    } catch (error: unknown) {
+      const errorMessage = (error as Error).message || "Error desconocido al desvincular del grupo"
+      toast.error(errorMessage)
     } finally {
       setDeletingGroup(false)
       setShowDeleteDialog(false)

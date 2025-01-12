@@ -1,5 +1,4 @@
-import { Button } from "@/components/ui/button"
-import { Target, Plus } from 'lucide-react'
+import { Target } from 'lucide-react'
 import { CreateOKRDialog } from "./create-okr-dialog"
 import { Group } from "../types"
 

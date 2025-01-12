@@ -4,9 +4,9 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Mail } from 'lucide-react'
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Mail } from "lucide-react";
 
 export function EmailPreview() {
   return (
@@ -29,8 +29,8 @@ export function EmailPreview() {
             <div className="bg-background p-3 rounded border">
               <h4 className="text-sm font-medium mt-0">Grupo: Metas Laborales</h4>
               <ul className="my-2 text-sm">
-                <li>María García - "Dominar Desarrollo en Next.js"</li>
-                <li>Juan Pérez - "Mejorar la Productividad del Equipo"</li>
+                <li>María García - &quot;Dominar Desarrollo en Next.js&quot;</li>
+                <li>Juan Pérez - &quot;Mejorar la Productividad del Equipo&quot;</li>
               </ul>
             </div>
             <p>¡Tu retroalimentación ayuda a mantener a todos motivados y en camino!</p>
@@ -42,6 +42,5 @@ export function EmailPreview() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
-
