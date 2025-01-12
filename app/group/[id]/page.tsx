@@ -4,8 +4,8 @@ import { useParams } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import { OKRCard } from "../../../components/okr-card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { getGroupMembers, getGroupObjectives, getGroupUpdates, getGroupsFromDB } from "@/utils/db";
-import type { Group, GroupMember, Objective, KeyResult, ProgressUpdate } from "@/types/database";
+import { getGroupMembers, getGroupsFromDB } from "@/utils/db";
+import type { Group, GroupMember, KeyResult } from "@/types/database";
 
 // Importa el CreateOKRDialog (asegúrate de que el componente esté correctamente exportado)
 import { CreateOKRDialog } from "@/components/create-okr-dialog";
@@ -13,45 +13,38 @@ import { CreateOKRDialog } from "@/components/create-okr-dialog";
 export default function GroupPage() {
   const { id: groupId } = useParams();
 
+  // Asegúrate de que groupId sea una cadena (en caso de que sea un arreglo, tomamos el primer valor)
+  const groupIdString = Array.isArray(groupId) ? groupId[0] : groupId;
+
   const [group, setGroup] = useState<Group | null>(null);
   const [groupMembers, setGroupMembers] = useState<GroupMember[]>([]);
-  const [objectives, setObjectives] = useState<(Objective & { key_results: KeyResult[] })[]>([]);
-  const [updates, setUpdates] = useState<ProgressUpdate[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadGroupData = async () => {
-      if (!groupId) return;
+      if (!groupIdString) return;
 
       try {
         setLoading(true);
         setError(null);
-        console.log(objectives)
-        console.log(updates)
+
         // Obtener los datos del grupo, miembros, objetivos y actualizaciones
-        const [groupData, membersData, objectivesData, updatesData] = await Promise.all([
+        const [groupData, membersData] = await Promise.all([
           getGroupsFromDB(),
-          getGroupMembers(groupId),
-          getGroupObjectives(groupId),
-          getGroupUpdates(groupId),
+          getGroupMembers(groupIdString), // Usamos groupIdString aquí
         ]);
 
         setGroup(groupData);
 
         const membersWithObjectives = membersData.map((member) => {
-          const memberObjectives = objectivesData.filter((obj) => obj.created_by === member.user_id);
+          const memberObjectives = groupData.flatMap((group) =>
+            group.objectives.filter((obj) => obj.created_by === member.user_id)
+          );
           return { ...member, objectives: memberObjectives };
         });
 
         setGroupMembers(membersWithObjectives);
-        setObjectives(
-          objectivesData.map((obj) => ({
-            ...obj,
-            key_results: obj.key_results || [],
-          }))
-        );
-        setUpdates(updatesData);
       } catch (error) {
         console.error("Error al cargar los datos del grupo:", error);
         setError("Hubo un problema al cargar los datos. Intenta nuevamente más tarde.");
@@ -61,7 +54,7 @@ export default function GroupPage() {
     };
 
     loadGroupData();
-  }, [groupId]); // Solo 'groupId' como dependencia
+  }, [groupIdString]); // Usamos groupIdString como dependencia
 
   if (loading) {
     return <div>Cargando...</div>;
