@@ -23,10 +23,10 @@ export interface Group {
 export interface GroupMember {
   user_id: string;
   role: string;
-  name: string; // From the profiles table
-  avatar_url?: string; // From the profiles table
-  objectives?: Objective[]; // Optional, populated post-fetch
+  profile?: { avatar_url?: string; name?: string }; // Agrega esta propiedad
+  objectives?: Objective[];
 }
+
 
 
 export interface KeyResult {
