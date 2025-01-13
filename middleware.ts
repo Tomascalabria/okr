@@ -23,11 +23,13 @@ export async function middleware(req: NextRequest) {
 
   // Redirigir a la página de autenticación si no hay sesión y se intenta acceder a una ruta protegida
   if (!session && isProtectedRoute && !isAuthPage) {
+    console.log("No session, redirecting to login");
     return NextResponse.redirect(new URL('/auth/login', req.url));
   }
 
   // Redirigir a la página de dashboard si ya hay una sesión y se intenta acceder a una página de autenticación
   if (session && isAuthPage && !isLoginPage) {
+    console.log("Session exists, redirecting to hero");
     return NextResponse.redirect(new URL('/hero', req.url));
   }
 
