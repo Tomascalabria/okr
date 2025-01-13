@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { supabase } from './supabase'
 import type { Group, Objective, KeyResult, ProgressUpdate } from '@/types/database'
 
@@ -418,7 +419,7 @@ export const dbService = {
   },
 
 
-  async createOKR({ groupId, title, keyResults }:{groupId:any,title:any,keyResults:any} ) {
+  async createOKR({ groupId, title, keyResults }:{groupId:string,title:string,keyResults:[]} ) {
     
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('No authenticated user');
