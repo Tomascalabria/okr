@@ -57,7 +57,6 @@ export async function getGroupUpdates(groupId: string) {
   return data
 } 
 
-
 export async function getGroupMembers(groupId: string): Promise<GroupMember[]> {
   const { data, error } = await supabase
     .from('group_members')
@@ -76,12 +75,12 @@ export async function getGroupMembers(groupId: string): Promise<GroupMember[]> {
 
   if (error) throw error;
 
-  // Retorna los miembros, asegurando que `profiles` no esté `undefined`.
+  // Retorna los miembros, asegurando que `profiles` no esté vacío o `undefined`.
   return data.map((member) => ({
     group_id: member.group_id,
     user_id: member.user_id,
     role: member.role,
     created_at: member.created_at,
-    profile: member.profiles || null,  // Si `profiles` no existe, asigna `null`.
+    profile: member.profiles.length > 0 ? member.profiles[0] : undefined, // Devuelve `undefined` si no hay perfil
   }));
 }
