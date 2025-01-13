@@ -13,10 +13,11 @@ import { supabase } from "@/lib/supabase";
 
 export default function Page() {
   const [groups, setGroups] = useState<Group[]>([]);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    const checkSession = async () => {
+    const checkSessionAndLoadData = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
 
@@ -24,23 +25,21 @@ export default function Page() {
 
         if (!session) {
           router.push("/auth/login");
+          return;
         }
-      } catch (error) {
-        console.error("Error checking session:", error);
-      }
-    };
 
-    const loadGroups = async () => {
-      try {
+        // Load groups if session exists
         const groupsData = await dbService.getUserGroups();
         setGroups(groupsData);
       } catch (error) {
-        console.error("Error loading groups:", error);
+        console.error("Error during session check or data loading:", error);
+        router.push("/auth/login");
+      } finally {
+        setLoading(false);
       }
     };
 
-    checkSession();
-    loadGroups();
+    checkSessionAndLoadData();
   }, [router]);
 
   const handleLogout = async () => {
@@ -56,6 +55,10 @@ export default function Page() {
     setGroups((prev) => [...prev, newGroup]);
   };
 
+  if (loading) {
+    return <div className="text-center py-8">Cargando...</div>;
+  }
+
   return (
     <div className="container max-w-6xl py-6">
       <div className="flex justify-between items-center mb-8">
@@ -69,13 +72,13 @@ export default function Page() {
         </div>
       </div>
 
-      <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {groups.map((group) => (
-          <GroupCard key={group.id} group={group} />
-        ))}
-      </div>
-
-      {groups.length === 0 && (
+      {groups.length > 0 ? (
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {groups.map((group) => (
+            <GroupCard key={group.id} group={group} />
+          ))}
+        </div>
+      ) : (
         <div className="text-center text-muted-foreground mt-8">
           No hay grupos creados. Crea tu primer grupo para comenzar.
         </div>
