@@ -1,67 +1,69 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { useRouter } from "next/navigation"; // Importa useRouter
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { useState } from "react"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { authService } from "@/lib/auth-service";
-import { toast } from "sonner";
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { authService } from '@/lib/auth-service'
+import { toast } from "sonner"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const router = useRouter(); // Inicializa el router
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
 
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
+    const formData = new FormData(e.currentTarget)
+    const email = formData.get("email") as string
+    const password = formData.get("password") as string
 
     try {
-      await authService.signIn(email, password);
-      toast.success("¡Inicio de sesión exitoso!");
+      await authService.signIn(email, password)
+      toast.success("¡Inicio de sesión exitoso!")
       setTimeout(() => {
-        router.push("/hero"); // Redirige usando el router de Next.js
-      }, 500);
+        window.location.href = '/hero'
+      }, 500)
     } catch (err) {
       if (err instanceof Error) {
+        // Manejo del error con un tipo seguro
         setError(
           err.message === "Invalid login credentials"
             ? "Credenciales inválidas. Por favor verifica tu email y contraseña."
             : "Ocurrió un error al iniciar sesión. Por favor intenta de nuevo."
-        );
-        toast.error(err.message);
+        )
+        toast.error(err.message)
       } else {
-        setError("Ocurrió un error inesperado.");
-        toast.error("Error inesperado.");
+        // Mensaje genérico si el error no es una instancia de Error
+        setError("Ocurrió un error inesperado.")
+        toast.error("Error inesperado.")
       }
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Iniciar Sesión</CardTitle>
-          <CardDescription>Accede con tu email</CardDescription>
+          <CardDescription>
+            Accede con tu email
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
@@ -88,7 +90,9 @@ export function LoginForm({
                 </div>
                 <Input id="password" name="password" type="password" required />
               </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
+              {error && (
+                <p className="text-sm text-red-500">{error}</p>
+              )}
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? "Iniciando sesión..." : "Iniciar Sesión"}
               </Button>
@@ -103,5 +107,5 @@ export function LoginForm({
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }
