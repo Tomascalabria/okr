@@ -13,7 +13,7 @@ export async function middleware(req: NextRequest) {
   console.log("Session:", session); // Verifica si la sesión está disponible
 
   // Rutas protegidas que requieren autenticación
-  const protectedRoutes = [ '/group'];
+  const protectedRoutes = [ '/dashboard'];
   const isProtectedRoute = protectedRoutes.some(route =>
     req.nextUrl.pathname.startsWith(route)
   );
