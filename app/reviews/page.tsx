@@ -83,7 +83,6 @@ export default function ReviewsPage() {
                 <div>
                   <h3 className="font-medium">{objective.title}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Revisión del Trimestre {objective.quarter}
                   </p>
                 </div>
                 <button
