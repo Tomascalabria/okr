@@ -1,4 +1,4 @@
-import { ProgressUpdateDialog } from "../../components/progress-update-dialog"
+// import { ProgressUpdateDialog } from "../../components/progress-update-dialog"
 // import { ProgressFeed } from "../../components/progress-feed"
 
 export default function ProgressPage() {
