@@ -94,47 +94,43 @@ export default function GroupPage() {
         </div>
       ) : (
         <div className="space-y-8">
-          {groupMembers.map((member) => {
-            const profile = member.profile as { avatar_url?: string; name?: string } | undefined;
-            return (
-              <div key={member.user_id}>
-                <div className="flex items-center gap-3 mb-2">
-                  <Avatar>
-                    <AvatarImage src={profile?.avatar_url || ""} />
-                    <AvatarFallback>
-                      {profile?.name
-                        ? profile.name.split(" ").map((n) => n[0]).join("")
-                        : "?"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="font-medium">{profile?.name || "Miembro Desconocido"}</span>
-                  <span className="text-sm text-muted-foreground">{member.role}</span>
-                </div>
-                {member.objectives && member.objectives.length > 0 ? (
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    {member.objectives.map((objective) => (
-                      <div key={objective.id}>
-                        <OKRCard
-                          objective={{
-                            title: objective.title,
-                            progress: objective.progress,
-                            keyResults: objective.key_results || [],
-                          }}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="py-4 px-6 bg-muted/50 rounded-lg text-sm text-muted-foreground">
-                    No hay objetivos asignados a este miembro.
-                  </div>
-                )}
-                <Separator className="mt-8" />
-              </div>
-            );
-          })}
+       {groupMembers.map((member) => {
+  const profile = member.profile as { avatar_url?: string; name?: string } | undefined;
+  return (
+    <div key={member.user_id}>
+      <div className="flex items-center gap-3 mb-2">
+        <Avatar>
+          <AvatarImage src={profile?.avatar_url || ""} />
+          <AvatarFallback>
+            {profile?.name
+              ? profile.name.split(" ").map((n) => n[0]).join("")
+              : "?"}
+          </AvatarFallback>
+        </Avatar>
+        <span className="font-medium">{profile?.name || "Miembro Desconocido"}</span>
+        <span className="text-sm text-muted-foreground">{member.role}</span>
+      </div>
+      {member.objectives && member.objectives.length > 0 ? (
+        <div className="grid sm:grid-cols-2 gap-4">
+          {member.objectives.map((objective) => (
+            <div key={objective.id}>
+              <OKRCard
+                objective={{
+                  title: objective.title,
+                  progress: objective.progress,
+                  keyResults: objective.key_results || [],
+                  createdBy: objective.profiles.name,  // Mostrar el nombre del creador del objetivo
+                }}
+              />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="py-4 px-6 bg-muted/50 rounded-lg text-sm text-muted-foreground">
+          No hay objetivos asignados a este miembro.
         </div>
       )}
+      <Separator className="mt-8" />
     </div>
   );
-}
+})}
