@@ -1,5 +1,5 @@
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -8,64 +8,57 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { PlusCircle } from "lucide-react"
-import { dbService } from "@/lib/db-service"
-import { toast } from "sonner"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { PlusCircle } from "lucide-react";
+import { dbService } from "@/lib/db-service";
+import { toast } from "sonner";
+import { Group } from "@/types/database";
 
 interface CreateGroupDialogProps {
-  isOpen: boolean
-  onClose: () => void
-  onGroupCreated: () => void // Function passed from parent to fetch updated groups
+  onGroupCreated: (newGroup: Group) => void; // Ahora acepta un argumento de tipo Group
 }
 
-export function CreateGroupDialog({ isOpen, onClose, onGroupCreated }: CreateGroupDialogProps) {
-  const [loading, setLoading] = useState(false)
+export function CreateGroupDialog({ onGroupCreated }: CreateGroupDialogProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-  })
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!formData.name.trim() || !formData.description.trim()) {
-      toast.error("Por favor completa todos los campos")
-      return
+      toast.error("Por favor completa todos los campos");
+      return;
     }
 
-    setLoading(true)
+    setLoading(true);
 
     try {
-   await dbService.createGroupWithInviteCode(
+      const newGroup = await dbService.createGroupWithInviteCode(
         formData.name,
         formData.description
-      )
+      );
 
-      toast.success("Grupo creado exitosamente")
-      onGroupCreated() // Fetch updated groups after creation
-      onClose()
-      setFormData({ name: "", description: "" })
-    } 
-    catch (error: unknown) {
-      // Type narrow the error to ensure it's an instance of Error
-      if (error instanceof Error) {
-        console.error("Error creating group:", error)
-        toast.error(error.message || "Error al crear el grupo")
-      } else {
-        console.error("Unknown error:", error)
-        toast.error("Error desconocido al crear el grupo")
-      }
+      toast.success("Grupo creado exitosamente");
+      onGroupCreated(newGroup); // Pasar el grupo creado al callback
+      setIsOpen(false);
+      setFormData({ name: "", description: "" });
+    } catch (error: any) {
+      console.error("Error creando el grupo:", error);
+      toast.error(error.message || "Error al crear el grupo");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>
           <PlusCircle className="mr-2 h-4 w-4" />
@@ -87,7 +80,9 @@ export function CreateGroupDialog({ isOpen, onClose, onGroupCreated }: CreateGro
                 id="name"
                 placeholder="Ej: Equipo de Desarrollo"
                 value={formData.name}
-                onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, name: e.target.value }))
+                }
                 required
               />
             </div>
@@ -97,7 +92,9 @@ export function CreateGroupDialog({ isOpen, onClose, onGroupCreated }: CreateGro
                 id="description"
                 placeholder="Describe el propósito del grupo..."
                 value={formData.description}
-                onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, description: e.target.value }))
+                }
                 required
               />
             </div>
@@ -106,7 +103,7 @@ export function CreateGroupDialog({ isOpen, onClose, onGroupCreated }: CreateGro
             <Button
               type="button"
               variant="outline"
-              onClick={() => onClose()}
+              onClick={() => setIsOpen(false)}
               disabled={loading}
             >
               Cancelar
@@ -118,5 +115,5 @@ export function CreateGroupDialog({ isOpen, onClose, onGroupCreated }: CreateGro
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

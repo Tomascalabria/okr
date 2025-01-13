@@ -417,7 +417,9 @@ export const dbService = {
     }
   },
 
-  async createOKR({ groupId, title, keyResults }) {
+
+  async createOKR({ groupId, title, keyResults }:{groupId:any,title:any,keyResults:any} ) {
+    
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('No authenticated user');
 

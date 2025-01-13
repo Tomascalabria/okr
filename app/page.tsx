@@ -3,14 +3,15 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { LogOut } from 'lucide-react'
+import {  LogOut } from 'lucide-react'
 import { dbService } from "@/lib/db-service"
+import { Group } from "@/types/database"
 import { CreateGroupDialog } from "@/components/create-group-dialog"
 import { GroupCard } from "../components/group-card"
 import { supabase } from "@/lib/supabase"
 
 export default function Page() {
-  const [groups, setGroups] = useState([])
+  const [groups, setGroups] = useState<Group[]>([]) // Cambiar el estado inicial a un array vacío
   const router = useRouter()
 
   useEffect(() => {
@@ -37,14 +38,16 @@ export default function Page() {
       console.error("Error durante el logout:", error)
     }
   }
-
+  const handleGroupCreated = (newGroup: Group) => {
+    setGroups((prev) => [...prev, newGroup]) // Añadir el nuevo grupo a la lista
+  }
 
   return (
     <div className="container max-w-6xl py-6">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-semibold">Tus OKRs 2025</h1>
         <div className="flex gap-2">
-          <CreateGroupDialog />
+          <CreateGroupDialog onGroupCreated={handleGroupCreated} />
           <Button variant="ghost" size="sm" onClick={handleLogout}>
             <LogOut className="h-4 w-4 mr-2" />
             Cerrar sesión
