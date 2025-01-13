@@ -45,13 +45,19 @@ export function RegisterForm({
       toast.success("¡Registro exitoso! Bienvenido.")
       router.push("/")
       router.refresh()
-    } catch (error: any) {
-      setError(
-        error.message.includes("email") 
-          ? "Este email ya está registrado o es inválido."
-          : "Error al crear la cuenta. Por favor intenta de nuevo."
-      )
-      toast.error(error.message)
+    } catch (error: unknown) {
+      // Verificar si el error es una instancia de Error
+      if (error instanceof Error) {
+        setError(
+          error.message.includes("email") 
+            ? "Este email ya está registrado o es inválido."
+            : "Error al crear la cuenta. Por favor intenta de nuevo."
+        )
+        toast.error(error.message)
+      } else {
+        setError("Error desconocido.")
+        toast.error("Error desconocido.")
+      }
     } finally {
       setLoading(false)
     }
@@ -63,7 +69,7 @@ export function RegisterForm({
         <CardHeader>
           <CardTitle className="text-2xl">Registro</CardTitle>
           <CardDescription>
-            Create una cuenta
+            Crea una cuenta
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -111,4 +117,4 @@ export function RegisterForm({
       </Card>
     </div>
   )
-} 
+}
