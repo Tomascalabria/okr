@@ -5,8 +5,6 @@ import { ArrowRight, Target } from 'lucide-react'
 import okrImage from '@/assets/img/okrbanner.jpg'; // Asegúrate de que esta ruta sea correcta
 import Image from 'next/image'
 
-
-
 export default function Page() {
 
   const handleButtonClick = () => {
@@ -29,21 +27,21 @@ export default function Page() {
         />
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-32 lg:flex lg:px-8 lg:py-40">
-        <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-xl lg:flex-shrink-0 lg:pt-8">
-          <div className="mt-24 sm:mt-32 lg:mt-16">
+      <div className="mx-auto max-w-7xl px-6 pb-24 pt-0 sm:pb-32 lg:flex lg:px-8 lg:py-40"> {/* Reduje el padding superior */}
+        <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-xl lg:flex-shrink-0 lg:pt-0"> {/* Eliminé el padding superior en este contenedor */}
+          <div className="mt-4 sm:mt-8 lg:mt-0"> {/* Ajusté el margen superior aquí */}
             <div className="inline-flex items-center space-x-2 rounded-full px-3 py-1 text-sm leading-6 text-muted-foreground ring-1 ring-ring/10 hover:ring-ring/20">
               <span>Versión 2025</span>
               <Target className="h-4 w-4 text-primary" />
             </div>
           </div>
-          <h1 className="mt-10 text-4xl font-bold tracking-tight sm:text-6xl">
+          <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-6xl"> {/* Ajusté el margen superior aquí */}
             Gestiona tus OKRs de manera efectiva
           </h1>
-          <p className="mt-6 text-lg leading-8 text-muted-foreground">
+          <p className="mt-4 text-lg leading-8 text-muted-foreground"> {/* Ajusté el margen superior aquí */}
             Llega a tu prime. No te dejes ganar.
           </p>
-          <div className="mt-10 flex items-center gap-x-6">
+          <div className="mt-8 flex items-center gap-x-6"> {/* Ajusté el margen superior aquí */}
             <Button size="lg" onClick={handleButtonClick} className="gap-2">
               Comenzar ahora
               <ArrowRight className="h-4 w-4" />
@@ -54,7 +52,7 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="mx-auto mt-16 flex max-w-2xl sm:mt-24 lg:ml-10 lg:mr-0 lg:mt-0 lg:max-w-none lg:flex-none xl:ml-32">
+        <div className="mx-auto mt-8 flex max-w-2xl sm:mt-24 lg:ml-10 lg:mr-0 lg:mt-0 lg:max-w-none lg:flex-none xl:ml-32">
           <div className="max-w-3xl flex-none sm:max-w-5xl lg:max-w-none">
             <Image
               src={okrImage}
