@@ -44,11 +44,13 @@
 
     const handleCreateOKR = async () => {
       try {
+const formattedKeyResults = keyResults.map(result => ({ description: result }));
+
         // Crear el OKR usando el groupId que seleccionó el usuario
         await dbService.createOKR({
           groupId: selectedGroup,
           title: objective,
-          keyResults: keyResults,
+          keyResults: formattedKeyResults,
         });
         setOpen(false);
       } catch (error) {
