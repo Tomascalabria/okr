@@ -1,7 +1,6 @@
 export interface KeyResult {
   id: string;
   description: string;
-  progress: number;
 }
 
 export interface Objective {
