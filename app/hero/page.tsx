@@ -8,7 +8,7 @@ import {  LogOut } from 'lucide-react'
 import { dbService } from "@/lib/db-service"
 import { Group } from "@/types/database"
 import { CreateGroupDialog } from "@/components/create-group-dialog"
-import { GroupCard } from "../components/group-card"
+import { GroupCard } from "@/components/group-card"
 import { supabase } from "@/lib/supabase"
 
 export default function Page() {

@@ -35,7 +35,7 @@ export function LoginForm({
       await authService.signIn(email, password)
       toast.success("¡Inicio de sesión exitoso!")
       setTimeout(() => {
-        window.location.href = '/'
+        window.location.href = '/hero'
       }, 500)
     } catch (err) {
       if (err instanceof Error) {
@@ -62,7 +62,7 @@ export function LoginForm({
         <CardHeader>
           <CardTitle className="text-2xl">Iniciar Sesión</CardTitle>
           <CardDescription>
-            Ingresa tu email para acceder a tu cuenta
+            Accede con tu email
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -98,7 +98,7 @@ export function LoginForm({
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">
-              ¿No tienes una cuenta?{" "}
+              ¿No tenes cuenta?{" "}
               <a href="/auth/register" className="underline underline-offset-4">
                 Regístrate
               </a>
