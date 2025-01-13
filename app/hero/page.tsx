@@ -1,47 +1,60 @@
 /* eslint-disable */
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import {  LogOut } from 'lucide-react'
-import { dbService } from "@/lib/db-service"
-import { Group } from "@/types/database"
-import { CreateGroupDialog } from "@/components/create-group-dialog"
-import { GroupCard } from "@/components/group-card"
-import { supabase } from "@/lib/supabase"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { LogOut } from "lucide-react";
+import { dbService } from "@/lib/db-service";
+import { Group } from "@/types/database";
+import { CreateGroupDialog } from "@/components/create-group-dialog";
+import { GroupCard } from "@/components/group-card";
+import { supabase } from "@/lib/supabase";
 
 export default function Page() {
-  const [groups, setGroups] = useState<Group[]>([]) // Cambiar el estado inicial a un array vacío
-  const router = useRouter()
+  const [groups, setGroups] = useState<Group[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+
+        console.log("Session in Hero Page:", session);
+
+        if (!session) {
+          router.push("/auth/login");
+        }
+      } catch (error) {
+        console.error("Error checking session:", error);
+      }
+    };
+
     const loadGroups = async () => {
       try {
-        const groupsData = await dbService.getUserGroups()
-        setGroups(groupsData)
+        const groupsData = await dbService.getUserGroups();
+        setGroups(groupsData);
       } catch (error) {
-        console.error("Error al cargar los grupos:", error)
+        console.error("Error loading groups:", error);
       }
-    }
+    };
 
-    loadGroups()
-  }, [])
+    checkSession();
+    loadGroups();
+  }, [router]);
 
   const handleLogout = async () => {
     try {
-      // Cerrar sesión con Supabase
-      await supabase.auth.signOut()
-      
-      // Redirigir al usuario a la página de inicio de sesión
-      router.push("/auth/login")
+      await supabase.auth.signOut();
+      router.push("/auth/login");
     } catch (error) {
-      console.error("Error durante el logout:", error)
+      console.error("Error during logout:", error);
     }
-  }
+  };
+
   const handleGroupCreated = (newGroup: Group) => {
-    setGroups((prev) => [...prev, newGroup]) // Añadir el nuevo grupo a la lista
-  }
+    setGroups((prev) => [...prev, newGroup]);
+  };
 
   return (
     <div className="container max-w-6xl py-6">
@@ -58,11 +71,7 @@ export default function Page() {
 
       <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
         {groups.map((group) => (
-          <GroupCard
-            key={group.id}
-            group={group}
-            
-          />
+          <GroupCard key={group.id} group={group} />
         ))}
       </div>
 
@@ -72,6 +81,5 @@ export default function Page() {
         </div>
       )}
     </div>
-  )
+  );
 }
-
