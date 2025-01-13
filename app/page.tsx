@@ -8,7 +8,7 @@ import Image from 'next/image'
 export default function Page() {
 
   const handleButtonClick = () => {
-    window.location.href = '/hero'
+    window.location.href = '/auth/login'
   }
 
   return (
