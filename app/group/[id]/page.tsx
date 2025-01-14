@@ -1,4 +1,3 @@
-/* eslint-disable */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -41,10 +40,11 @@ export default function GroupPage() {
         const selectedGroup = groupsData.find((g) => g.id === groupId) || null;
         setGroup(selectedGroup);
 
-        // Map objectives to group members
+        // Map objectives to group members and ensure profile is assigned correctly
         const membersWithObjectives = membersData.map((member) => {
           const memberObjectives = objectivesData.filter((obj) => obj.created_by === member.user_id);
-          return { ...member, objectives: memberObjectives };
+          const profile = member.profiles ? member.profiles[0] : {}; // Ensure profile is properly assigned
+          return { ...member, objectives: memberObjectives, profile };
         });
 
         setGroupMembers(membersWithObjectives);
@@ -105,8 +105,8 @@ export default function GroupPage() {
       ) : (
         <div className="space-y-8">
           {groupMembers.map((member) => {
-            const profile = member.profile // Cambié aquí
-          console.log(profile)
+            const profile = member.profile; // Accediendo correctamente al perfil
+            console.log(profile); // Asegúrate de que los datos de perfil están llegando correctamente
             return (
               <div key={member.user_id}>
                 <div className="flex items-center gap-3 mb-2">
