@@ -119,16 +119,17 @@ export default function GroupPage() {
                 </div>
                 {member.objectives && member.objectives.length > 0 ? (
                   <div className="grid sm:grid-cols-2 gap-4">
-                    {member.objectives.map((objective) => (
-                      <div key={objective.id}>
-                        <OKRCard
-                          objective={{
-                            title: objective.title,
-                            progress: objective.progress,
-                            keyResults: objective.key_results || [],
-                            createdBy: objective.profiles.name, // Mostrar el nombre del creador del objetivo
-                          }}
-                        />
+                 {member.objectives && member.objectives.length > 0 ? (
+        <div className="grid sm:grid-cols-2 gap-4">
+          {member.objectives.map((objective) => (
+            <div key={objective.id}>
+              <OKRCard
+                objective={{
+                  title: objective.title,
+                  progress: objective.progress,
+                  keyResults: objective.key_results || [],
+                }}
+              />
                       </div>
                     ))}
                   </div>
