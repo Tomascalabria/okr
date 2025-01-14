@@ -106,6 +106,7 @@ export default function GroupPage() {
         <div className="space-y-8">
           {groupMembers.map((member) => {
             const profile = member.profiles; // Cambié aquí
+          console.log(profile)
             return (
               <div key={member.user_id}>
                 <div className="flex items-center gap-3 mb-2">
