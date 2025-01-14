@@ -29,6 +29,7 @@ export default function GroupPage() {
         setLoading(true);
         setError(null);
 
+        // Fetch data concurrently
         const [groupsData, membersData, objectivesData, updatesData] = await Promise.all([
           getGroupsFromDB(),
           getGroupMembers(groupId),
@@ -36,9 +37,11 @@ export default function GroupPage() {
           getGroupUpdates(groupId),
         ]);
 
+        // Find the correct group by ID
         const selectedGroup = groupsData.find((g) => g.id === groupId) || null;
         setGroup(selectedGroup);
 
+        // Map objectives to group members
         const membersWithObjectives = membersData.map((member) => {
           const memberObjectives = objectivesData.filter((obj) => obj.created_by === member.user_id);
           return { ...member, objectives: memberObjectives };
@@ -46,6 +49,7 @@ export default function GroupPage() {
 
         setGroupMembers(membersWithObjectives);
 
+        // Set objectives and updates
         setObjectives(
           objectivesData.map((obj) => ({
             ...obj,
@@ -61,7 +65,6 @@ export default function GroupPage() {
       }
     };
 
-    console.log("Cargando datos para el grupo:", groupId);
     loadGroupData();
   }, [groupId]);
 
@@ -79,6 +82,10 @@ export default function GroupPage() {
 
   const hasAnyOKRs = groupMembers.some((member) => member.objectives && member.objectives.length > 0);
 
+  const handleNewOKR = (newOKR: any) => {
+    setObjectives((prevObjectives) => [...prevObjectives, newOKR]);
+  };
+
   return (
     <div className="container max-w-5xl mx-auto py-6">
       <div className="mb-8 flex flex-col items-start">
@@ -87,7 +94,7 @@ export default function GroupPage() {
             <h1 className="text-2xl font-bold">{group.name}</h1>
             <p className="text-sm text-muted-foreground">{group.description}</p>
           </div>
-          <CreateOKRDialog groups={[group]} />
+          <CreateOKRDialog groups={[group]} onOKRCreated={handleNewOKR} />
         </div>
       </div>
 
@@ -99,7 +106,6 @@ export default function GroupPage() {
         <div className="space-y-8">
           {groupMembers.map((member) => {
             const profile = member.profile as { avatar_url?: string; name?: string } | undefined;
-
             return (
               <div key={member.user_id}>
                 <div className="flex items-center gap-3 mb-2">
@@ -114,7 +120,25 @@ export default function GroupPage() {
                   <span className="font-medium">{profile?.name || "Miembro Desconocido"}</span>
                   <span className="text-sm text-muted-foreground">{member.role}</span>
                 </div>
-                {renderObjectives(member.objectives)}
+                {member.objectives && member.objectives.length > 0 ? (
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    {member.objectives.map((objective) => (
+                      <div key={objective.id}>
+                        <OKRCard
+                          objective={{
+                            title: objective.title,
+                            progress: objective.progress,
+                            keyResults: objective.key_results || [],
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="py-4 px-6 bg-muted/50 rounded-lg text-sm text-muted-foreground">
+                    No hay objetivos asignados a este miembro.
+                  </div>
+                )}
                 <Separator className="mt-8" />
               </div>
             );
@@ -123,29 +147,4 @@ export default function GroupPage() {
       )}
     </div>
   );
-
-  function renderObjectives(objectives: Objective[] | undefined) {
-    if (!objectives || objectives.length === 0) {
-      return (
-        <div className="py-4 px-6 bg-muted/50 rounded-lg text-sm text-muted-foreground">
-          No hay objetivos asignados a este miembro.
-        </div>
-      );
-    }
-
-    return (
-      <div className="grid sm:grid-cols-2 gap-4">
-        {objectives.map((objective) => (
-          <OKRCard
-            key={objective.id}
-            objective={{
-              title: objective.title,
-              progress: objective.progress,
-              keyResults: objective.key_results || [],
-            }}
-          />
-        ))}
-      </div>
-    );
-  }
 }
