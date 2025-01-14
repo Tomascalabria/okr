@@ -29,21 +29,27 @@ export default function GroupPage() {
         setLoading(true);
         setError(null);
 
-        const [groupData, membersData, objectivesData, updatesData] = await Promise.all([
+        // Fetch data concurrently
+        const [groupsData, membersData, objectivesData, updatesData] = await Promise.all([
           getGroupsFromDB(),
           getGroupMembers(groupId),
           getGroupObjectives(groupId),
           getGroupUpdates(groupId),
         ]);
 
-        setGroup(groupData[0] || null);
+        // Find the correct group by ID
+        const selectedGroup = groupsData.find((g) => g.id === groupId) || null;
+        setGroup(selectedGroup);
 
+        // Map objectives to group members
         const membersWithObjectives = membersData.map((member) => {
           const memberObjectives = objectivesData.filter((obj) => obj.created_by === member.user_id);
           return { ...member, objectives: memberObjectives };
         });
 
         setGroupMembers(membersWithObjectives);
+
+        // Set objectives and updates
         setObjectives(
           objectivesData.map((obj) => ({
             ...obj,
@@ -59,6 +65,7 @@ export default function GroupPage() {
       }
     };
 
+    console.log("Cargando datos para el grupo:", groupId);
     loadGroupData();
   }, [groupId]);
 
@@ -94,43 +101,48 @@ export default function GroupPage() {
         </div>
       ) : (
         <div className="space-y-8">
-       {groupMembers.map((member) => {
-  const profile = member.profile as { avatar_url?: string; name?: string } | undefined;
-  return (
-    <div key={member.user_id}>
-      <div className="flex items-center gap-3 mb-2">
-        <Avatar>
-          <AvatarImage src={profile?.avatar_url || ""} />
-          <AvatarFallback>
-            {profile?.name
-              ? profile.name.split(" ").map((n) => n[0]).join("")
-              : "?"}
-          </AvatarFallback>
-        </Avatar>
-        <span className="font-medium">{profile?.name || "Miembro Desconocido"}</span>
-        <span className="text-sm text-muted-foreground">{member.role}</span>
-      </div>
-      {member.objectives && member.objectives.length > 0 ? (
-        <div className="grid sm:grid-cols-2 gap-4">
-          {member.objectives.map((objective) => (
-            <div key={objective.id}>
-              <OKRCard
-                objective={{
-                  title: objective.title,
-                  progress: objective.progress,
-                  keyResults: objective.key_results || [],
-                  createdBy: objective.profiles.name,  // Mostrar el nombre del creador del objetivo
-                }}
-              />
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="py-4 px-6 bg-muted/50 rounded-lg text-sm text-muted-foreground">
-          No hay objetivos asignados a este miembro.
+          {groupMembers.map((member) => {
+            const profile = member.profile as { avatar_url?: string; name?: string } | undefined;
+            return (
+              <div key={member.user_id}>
+                <div className="flex items-center gap-3 mb-2">
+                  <Avatar>
+                    <AvatarImage src={profile?.avatar_url || ""} />
+                    <AvatarFallback>
+                      {profile?.name
+                        ? profile.name.split(" ").map((n) => n[0]).join("")
+                        : "?"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="font-medium">{profile?.name || "Miembro Desconocido"}</span>
+                  <span className="text-sm text-muted-foreground">{member.role}</span>
+                </div>
+                {member.objectives && member.objectives.length > 0 ? (
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    {member.objectives.map((objective) => (
+                      <div key={objective.id}>
+                        <OKRCard
+                          objective={{
+                            title: objective.title,
+                            progress: objective.progress,
+                            keyResults: objective.key_results || [],
+                            createdBy: objective.profiles.name, // Mostrar el nombre del creador del objetivo
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="py-4 px-6 bg-muted/50 rounded-lg text-sm text-muted-foreground">
+                    No hay objetivos asignados a este miembro.
+                  </div>
+                )}
+                <Separator className="mt-8" />
+              </div>
+            );
+          })}
         </div>
       )}
-      <Separator className="mt-8" />
     </div>
   );
-})}
+}
