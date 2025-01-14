@@ -23,7 +23,7 @@ import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
 import { Group } from "../types";
 import { dbService } from "@/lib/db-service";
-import { toast } from "react-toastify";
+import { toast } from "sonner"; // Cambiado a sonner
 
 interface CreateOKRDialogProps {
   groups: Group[]; // Aquí pasas todos los grupos disponibles
@@ -54,8 +54,8 @@ export function CreateOKRDialog({ groups = [], onOKRCreated }: CreateOKRDialogPr
         keyResults: formattedKeyResults,
       });
 
-      // Mostrar el toast de éxito
-      toast.success("OKR creado con éxito!");
+      // Mostrar el toast de éxito usando sonner
+      toast.success("OKR creado con éxito!"); // Cambiado a sonner
 
       // Llamar al callback para renderizar el nuevo OKR sin recargar el componente
       onOKRCreated(createdOKR);
@@ -63,7 +63,7 @@ export function CreateOKRDialog({ groups = [], onOKRCreated }: CreateOKRDialogPr
       setOpen(false);
     } catch (error) {
       console.error("Error al crear el OKR:", error);
-      toast.error("Hubo un problema al crear el OKR.");
+      toast.error("Hubo un problema al crear el OKR."); // Cambiado a sonner
     }
   };
 
