@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,9 +23,16 @@ import { Group } from "../types";
 import { dbService } from "@/lib/db-service";
 import { toast } from "sonner"; // Cambiado a sonner
 
+interface OKR {
+  id: string;
+  groupId: string;
+  title: string;
+  keyResults: { description: string }[];
+}
+
 interface CreateOKRDialogProps {
   groups: Group[]; // Aquí pasas todos los grupos disponibles
-  onOKRCreated: (okr: any) => void; // Callback para renderizar el nuevo OKR
+  onOKRCreated: (okr: OKR) => void; // Callback para renderizar el nuevo OKR
 }
 
 export function CreateOKRDialog({ groups = [], onOKRCreated }: CreateOKRDialogProps) {
