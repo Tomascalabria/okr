@@ -105,7 +105,7 @@ export default function GroupPage() {
       ) : (
         <div className="space-y-8">
           {groupMembers.map((member) => {
-            const profile = member.profile as { avatar_url?: string; name?: string } | undefined;
+            const profile = member.profiles as { avatar_url?: string; name?: string } | undefined; // Cambié aquí
             return (
               <div key={member.user_id}>
                 <div className="flex items-center gap-3 mb-2">
