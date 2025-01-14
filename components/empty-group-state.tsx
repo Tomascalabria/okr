@@ -8,8 +8,8 @@ interface EmptyGroupStateProps {
 }
 
 export function EmptyGroupState({ group }: EmptyGroupStateProps) {
-  const handleOKRCreation = (okr: OKR) => {
-    // Aquí podrías manejar el OKR creado, por ejemplo, actualizando el estado o mostrando un toast
+  const handleOKRCreation = () => {
+    // Aquí puedes manejar lo que pasa cuando un OKR es creado
     toast.success("OKR creado con éxito para el grupo " + group.name);
   };
 
