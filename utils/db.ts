@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase'
-import type { Group, GroupMember, Objective, ProgressUpdate } from '@/types/database'
+import type { Group, GroupMember, Objective, Profile, ProgressUpdate } from '@/types/database'
 
 export async function getGroupsFromDB() {
   const { data: { user } } = await supabase.auth.getUser()
@@ -59,28 +59,29 @@ export async function getGroupUpdates(groupId: string) {
 
 export async function getGroupMembers(groupId: string): Promise<GroupMember[]> {
   const { data, error } = await supabase
-    .from('group_members')
-    .select(`
-      group_id,
-      user_id,
-      role,
-      created_at,
-      profiles (
-        id,
-        name,
-        avatar_url
-      )
-    `)
-    .eq('group_id', groupId);
-
+  .from('group_members')
+  .select(`
+    group_id,
+    user_id,
+    role,
+    created_at,
+    profiles (
+      id,
+      name,
+      avatar_url
+    )
+  `)
+  .eq('group_id', groupId);
+  
   if (error) throw error;
 
-  // Retorna los miembros, asegurando que `profiles` no esté vacío o `undefined`.
+  // Asegúrate de que `profile` sea un único objeto, no un array.
   return data.map((member) => ({
     group_id: member.group_id,
     user_id: member.user_id,
     role: member.role,
     created_at: member.created_at,
-    profile: member.profiles.length > 0 ? member.profiles[0] : undefined, // Devuelve `undefined` si no hay perfil
+    profile: member.profiles as unknown as Profile, // Omitimos el error utilizando 'as'
   }));
+  
 }

@@ -10,7 +10,6 @@ export async function middleware(req: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession();
 
-  console.log("Session:", session); // Verifica si la sesión está disponible
 
   // Rutas protegidas que requieren autenticación
   const protectedRoutes = [ '/dashboard'];

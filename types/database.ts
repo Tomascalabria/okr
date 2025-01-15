@@ -23,7 +23,7 @@ export interface Group {
 export interface GroupMember {
   user_id: string;
   role: string;
-  profile?: { avatar_url?: string; name?: string }; // Agrega esta propiedad
+  profile?:Profile // Agrega esta propiedad
   objectives?: Objective[];
 }
 

@@ -245,7 +245,7 @@ export const dbService = {
       .select(`
         user_id,
         role,
-        profiles:user_id (
+        profiles?:user_id (
           name,
           avatar_url
         )

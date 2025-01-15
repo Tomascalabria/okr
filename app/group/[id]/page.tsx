@@ -40,10 +40,10 @@ export default function GroupPage() {
         const selectedGroup = groupsData.find((g) => g.id === groupId) || null;
         setGroup(selectedGroup);
 
-        // Map objectives to group members and ensure profile is assigned correctly
+        // Map members with objectives and ensure profile is assigned correctly
         const membersWithObjectives = membersData.map((member) => {
           const memberObjectives = objectivesData.filter((obj) => obj.created_by === member.user_id);
-          const profile = member.profiles ? member.profiles[0] : {}; // Ensure profile is properly assigned
+          const profile = member.profile; // Use "profile" instead of "profiles"
           return { ...member, objectives: memberObjectives, profile };
         });
 
@@ -58,8 +58,8 @@ export default function GroupPage() {
         );
         setUpdates(updatesData);
       } catch (error) {
-        console.error("Error al cargar los datos del grupo:", error);
-        setError("Hubo un problema al cargar los datos. Intenta nuevamente más tarde.");
+        console.error("Error loading group data:", error);
+        setError("There was a problem loading the data. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -69,7 +69,7 @@ export default function GroupPage() {
   }, [groupId]);
 
   if (loading) {
-    return <div>Cargando...</div>;
+    return <div>Loading...</div>;
   }
 
   if (error) {
@@ -77,7 +77,7 @@ export default function GroupPage() {
   }
 
   if (!group) {
-    return <div>No se encontraron detalles del grupo.</div>;
+    return <div>No group details found.</div>;
   }
 
   const hasAnyOKRs = groupMembers.some((member) => member.objectives && member.objectives.length > 0);
@@ -100,27 +100,26 @@ export default function GroupPage() {
 
       {!hasAnyOKRs ? (
         <div className="py-4 px-6 bg-muted/50 rounded-lg text-sm text-muted-foreground">
-          No hay OKRs definidos aún en este grupo.
+          No OKRs have been defined in this group yet.
         </div>
       ) : (
         <div className="space-y-8">
-          {groupMembers.map((member) => {
-            const profile = member.profile; // Accediendo correctamente al perfil
-            console.log(profile); // Asegúrate de que los datos de perfil están llegando correctamente
-            return (
-              <div key={member.user_id}>
-                <div className="flex items-center gap-3 mb-2">
-                  <Avatar>
-                    <AvatarImage src={profile?.avatar_url || ""} />
-                    <AvatarFallback>
-                      {profile?.name
-                        ? profile.name.split(" ").map((n) => n[0]).join("")
-                        : "?"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="font-medium">{profile?.name || "Miembro Desconocido"}</span>
-                  <span className="text-sm text-muted-foreground">{member.role}</span>
-                </div>
+{groupMembers.map((member) => {
+  const profile = member.profile;
+  return (
+    <div key={member.user_id}>
+      <div className="flex items-center gap-3 mb-2">
+        <Avatar>
+          <AvatarImage src={profile?.avatar_url || ""} />
+          <AvatarFallback>
+            {profile?.name
+              ? profile.name.split(" ").map((n) => n[0]).join("")
+              : "?"}
+          </AvatarFallback>
+        </Avatar>
+        <span className="font-medium">{profile?.name || "Unknown Member"}</span>
+        <span className="text-sm text-muted-foreground">{member.role}</span>
+      </div>
                 {member.objectives && member.objectives.length > 0 ? (
                   <div className="grid sm:grid-cols-2 gap-4">
                     {member.objectives.map((objective) => (
@@ -137,7 +136,7 @@ export default function GroupPage() {
                   </div>
                 ) : (
                   <div className="py-4 px-6 bg-muted/50 rounded-lg text-sm text-muted-foreground">
-                    No hay objetivos asignados a este miembro.
+                    No objectives assigned to this member.
                   </div>
                 )}
                 <Separator className="mt-8" />
