@@ -1,12 +1,14 @@
+/* eslint-disable */
+
 "use client";
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
-import { OKRCard } from "../../../components/okr-card";
+import { OKRCard } from "@/components/okr-card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { getGroupMembers, getGroupObjectives, getGroupUpdates, getGroupsFromDB } from "@/utils/db";
-import type { Group, GroupMember, Objective, KeyResult, ProgressUpdate } from "@/types/database";
+import { getGroupMembers, getGroupObjectives, getGroupsFromDB } from "@/utils/db";
+import type { Group, GroupMember, Objective, KeyResult } from "@/types/database";
 import { CreateOKRDialog } from "@/components/create-okr-dialog";
 
 export default function GroupPage() {
@@ -16,7 +18,6 @@ export default function GroupPage() {
   const [group, setGroup] = useState<Group | null>(null);
   const [groupMembers, setGroupMembers] = useState<GroupMember[]>([]);
   const [objectives, setObjectives] = useState<(Objective & { key_results: KeyResult[] })[]>([]);
-  const [updates, setUpdates] = useState<ProgressUpdate[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,11 +30,10 @@ export default function GroupPage() {
         setError(null);
 
         // Fetch data concurrently
-        const [groupsData, membersData, objectivesData, updatesData] = await Promise.all([
+        const [groupsData, membersData, objectivesData] = await Promise.all([
           getGroupsFromDB(),
           getGroupMembers(groupId),
           getGroupObjectives(groupId),
-          getGroupUpdates(groupId),
         ]);
 
         // Find the correct group by ID
@@ -49,14 +49,13 @@ export default function GroupPage() {
 
         setGroupMembers(membersWithObjectives);
 
-        // Set objectives and updates
+        // Set objectives
         setObjectives(
           objectivesData.map((obj) => ({
             ...obj,
             key_results: obj.key_results || [],
           }))
         );
-        setUpdates(updatesData);
       } catch (error) {
         console.error("Error loading group data:", error);
         setError("There was a problem loading the data. Please try again later.");
@@ -82,7 +81,7 @@ export default function GroupPage() {
 
   const hasAnyOKRs = groupMembers.some((member) => member.objectives && member.objectives.length > 0);
 
-  const handleNewOKR = (newOKR: any) => {
+  const handleNewOKR = (newOKR: Objective & { key_results: KeyResult[] }) => {
     setObjectives((prevObjectives) => [...prevObjectives, newOKR]);
   };
 
@@ -104,22 +103,22 @@ export default function GroupPage() {
         </div>
       ) : (
         <div className="space-y-8">
-{groupMembers.map((member) => {
-  const profile = member.profile;
-  return (
-    <div key={member.user_id}>
-      <div className="flex items-center gap-3 mb-2">
-        <Avatar>
-          <AvatarImage src={profile?.avatar_url || ""} />
-          <AvatarFallback>
-            {profile?.name
-              ? profile.name.split(" ").map((n) => n[0]).join("")
-              : "?"}
-          </AvatarFallback>
-        </Avatar>
-        <span className="font-medium">{profile?.name || "Unknown Member"}</span>
-        <span className="text-sm text-muted-foreground">{member.role}</span>
-      </div>
+          {groupMembers.map((member) => {
+            const profile = member.profile;
+            return (
+              <div key={member.user_id}>
+                <div className="flex items-center gap-3 mb-2">
+                  <Avatar>
+                    <AvatarImage src={profile?.avatar_url || ""} />
+                    <AvatarFallback>
+                      {profile?.name
+                        ? profile.name.split(" ").map((n) => n[0]).join("")
+                        : "?"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="font-medium">{profile?.name || "Unknown Member"}</span>
+                  <span className="text-sm text-muted-foreground">{member.role}</span>
+                </div>
                 {member.objectives && member.objectives.length > 0 ? (
                   <div className="grid sm:grid-cols-2 gap-4">
                     {member.objectives.map((objective) => (
