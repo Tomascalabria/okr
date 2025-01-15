@@ -50,26 +50,33 @@ export function GroupMembers({ groupId, groupName, inviteCode }: GroupMembersPro
           dbService.getUserRole(groupId)
         ])
 
-        // Asumiendo que la respuesta de dbService.getGroupMembers es de tipo GroupMember[]
-        interface MemberProfile {
-          name: string;
-          avatar_url: string | null;
-        }
-        
-        interface MemberData {
-          user_id: string;
-          role: string;
-          profiles: MemberProfile | MemberProfile[];  // Profiles can be an object or an array
-        }
-        
-        const formattedMembersData = membersData.map((member: MemberData) => ({
-          user_id: member.user_id,
-          role: member.role,
-          profiles: {
-            name: Array.isArray(member.profiles) ? member.profiles[0]?.name || '' : member.profiles.name,
-            avatar_url: Array.isArray(member.profiles) ? member.profiles[0]?.avatar_url || null : member.profiles.avatar_url,
-          },
-        }));
+   interface MemberProfile {
+  name: string;
+  avatar_url: string | null;
+}
+
+interface MemberData {
+  user_id: string;
+  role: string;
+  profiles: MemberProfile | MemberProfile[];
+}
+
+const formattedMembersData = membersData.map((member: any) => {
+  // Verifica si profiles es un array o un objeto
+  const profiles = Array.isArray(member.profiles)
+    ? member.profiles[0] // Toma el primer elemento si es un array
+    : member.profiles; // Usa el objeto directamente si no es un array
+
+  // Devuelve el objeto formateado con valores predeterminados
+  return {
+    user_id: member.user_id,
+    role: member.role,
+    profiles: {
+      name: profiles?.name || "Desconocido",
+      avatar_url: profiles?.avatar_url || null,
+    },
+  };
+});
                 setMembers(formattedMembersData)
         setUserRole(roleData)
       } catch (error) {
