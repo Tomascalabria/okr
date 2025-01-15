@@ -45,12 +45,13 @@ export function GroupMembers({ groupId, groupName, inviteCode }: GroupMembersPro
   useEffect(() => {
     const loadData = async () => {
       try {
+            
         const [membersData, roleData] = await Promise.all([
           dbService.getGroupMembers(groupId), 
           dbService.getUserRole(groupId)
-          membersData
+      
         ])
-
+consoole.log(membersData)
    interface MemberProfile {
   name: string;
   avatar_url: string | null;
