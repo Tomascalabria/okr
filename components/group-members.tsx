@@ -51,7 +51,7 @@ export function GroupMembers({ groupId, groupName, inviteCode }: GroupMembersPro
           dbService.getUserRole(groupId)
       
         ])
-consoole.log(membersData)
+console.log(membersData)
    interface MemberProfile {
   name: string;
   avatar_url: string | null;
