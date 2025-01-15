@@ -48,6 +48,7 @@ export function GroupMembers({ groupId, groupName, inviteCode }: GroupMembersPro
         const [membersData, roleData] = await Promise.all([
           dbService.getGroupMembers(groupId), 
           dbService.getUserRole(groupId)
+          membersData
         ])
 
    interface MemberProfile {
@@ -58,22 +59,20 @@ export function GroupMembers({ groupId, groupName, inviteCode }: GroupMembersPro
 interface MemberData {
   user_id: string;
   role: string;
-  profiles: MemberProfile | MemberProfile[];
+  profiles: MemberProfile;
 }
 
-const formattedMembersData = membersData.map((member: any) => {
-  // Verifica si profiles es un array o un objeto
+const formattedMembersData = membersData.map((member: MemberData) => {
   const profiles = Array.isArray(member.profiles)
-    ? member.profiles[0] // Toma el primer elemento si es un array
-    : member.profiles; // Usa el objeto directamente si no es un array
+    ? member.profiles[0]
+    : member.profiles;
 
-  // Devuelve el objeto formateado con valores predeterminados
   return {
     user_id: member.user_id,
     role: member.role,
     profiles: {
-      name: profiles?.name || "Desconocido",
-      avatar_url: profiles?.avatar_url || null,
+      name: profiles?.name ,
+      avatar_url: profiles?.avatar_url ,
     },
   };
 });
