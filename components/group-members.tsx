@@ -61,7 +61,7 @@ useEffect(() => {
         // Mapea los miembros con sus perfiles, asegurándote de que 'profiles' exista
         const formattedMembersData = membersData.map((member) => {
           // Verifica si 'profiles' existe y asigna un valor predeterminado si es necesario
-          const profileData = member.profiles
+          const profileData = member.profile
 
           return {
             user_id: member.user_id,
