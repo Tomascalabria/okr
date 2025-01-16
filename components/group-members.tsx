@@ -46,31 +46,31 @@ export function GroupMembers({ groupId, groupName, inviteCode }: GroupMembersPro
 
   useEffect(() => {
     const loadData = async () => {
-  try {
-    const [membersData, roleData] = await Promise.all([
-      dbService.getGroupMembers(groupId), // Asegúrate de que el servicio devuelve datos con el tipo correcto
-      dbService.getUserRole(groupId),
-    ]);
+      try {
+        const [membersData, roleData] = await Promise.all([
+          dbService.getGroupMembers(groupId), // Asegúrate de que el servicio devuelve datos con el tipo correcto
+          dbService.getUserRole(groupId),
+        ]);
 
-    const formattedMembersData = membersData.map((member: MemberData) => {
-      const profileData = member.profiles || { name: "Sin Nombre", avatar_url: null };
+        const formattedMembersData = membersData.map((member: GroupMember) => {
+          const profileData = member.profiles || { name: "Sin Nombre", avatar_url: null };
 
-      return {
-        user_id: member.user_id,
-        role: member.role,
-        profiles: {
-          name: profileData.name,
-          avatar_url: profileData.avatar_url,
-        },
-      };
-    });
+          return {
+            user_id: member.user_id,
+            role: member.role,
+            profiles: {
+              name: profileData.name,
+              avatar_url: profileData.avatar_url,
+            },
+          };
+        });
 
-    setMembers(formattedMembersData);
-    setUserRole(roleData);
-  } catch (error) {
-    console.error("Error loading data:", error);
-  }
-};
+        setMembers(formattedMembersData);
+        setUserRole(roleData);
+      } catch (error) {
+        console.error("Error loading data:", error);
+      }
+    };
 
     loadData();
   }, [groupId]);
@@ -155,7 +155,6 @@ export function GroupMembers({ groupId, groupName, inviteCode }: GroupMembersPro
         ))}
       </div>
 
-
       <Dialog open={showInviteDialog} onOpenChange={setShowInviteDialog}>
         <DialogContent>
           <DialogHeader>
@@ -231,5 +230,5 @@ export function GroupMembers({ groupId, groupName, inviteCode }: GroupMembersPro
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }
