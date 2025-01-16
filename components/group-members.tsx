@@ -17,15 +17,19 @@ import { dbService } from "@/lib/db-service";
 import { Copy, UserPlus, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+// Interfaces de tipo actualizadas según la estructura de los datos
 interface Profile {
+  id: string;
   name: string;
   avatar_url: string | null;
 }
 
 interface GroupMember {
+  group_id: string;
   user_id: string;
   role: string;
-  profiles: Profile | null; // Asegurar que el tipo coincida con la estructura esperada
+  created_at: string;
+  profiles: Profile;
 }
 
 interface GroupMembersProps {
@@ -52,151 +56,128 @@ export function GroupMembers({ groupId, groupName, inviteCode }: GroupMembersPro
           dbService.getUserRole(groupId),
         ]);
 
-        const formattedMembersData = membersData.map((member: GroupMember) => {
-          const profileData = member.profiles || { name: "Sin Nombre", avatar_url: null };
+        // Validar que membersData tiene el formato correcto
+        if (Array.isArray(membersData)) {
+          const formattedMembersData = membersData.map((member: GroupMember) => {
+            const profileData = member.profiles || { name: "Sin Nombre", avatar_url: null };
+            return {
+              user_id: member.user_id,
+              role: member.role,
+              profiles: {
+                name: profileData.name,
+                avatar_url: profileData.avatar_url,
+              },
+            };
+          });
 
-          return {
-            user_id: member.user_id,
-            role: member.role,
-            profiles: {
-              name: profileData.name,
-              avatar_url: profileData.avatar_url,
-            },
-          };
-        });
+          setMembers(formattedMembersData);
+        } else {
+          console.error("Los datos de los miembros no tienen el formato esperado", membersData);
+        }
 
-        setMembers(formattedMembersData);
+        // Establecer el rol del usuario
         setUserRole(roleData);
+
       } catch (error) {
-        console.error("Error loading data:", error);
+        console.error("Error cargando los datos del grupo", error);
       }
     };
 
     loadData();
   }, [groupId]);
 
-  const copyInviteLink = () => {
-    const link = `${window.location.origin}/join/${inviteCode}`;
-    navigator.clipboard.writeText(link);
-    toast.success("Enlace de invitación copiado!");
+  const handleInvite = () => {
+    setShowInviteDialog(true);
   };
 
-  const handleLeaveGroup = async () => {
-    try {
-      setLeavingGroup(true);
-      await dbService.leaveGroup(groupId);
-      toast.success("Has salido del grupo exitosamente");
-      router.refresh();
-      router.push("/");
-    } catch (error: unknown) {
-      const errorMessage = (error as Error).message || "Error desconocido al salir del grupo";
-      toast.error(errorMessage);
-    } finally {
-      setLeavingGroup(false);
-      setShowLeaveDialog(false);
-    }
+  const handleLeaveGroup = () => {
+    setShowLeaveDialog(true);
   };
 
-  const handleUnlinkGroup = async () => {
-    try {
-      setDeletingGroup(true);
-      await dbService.unlinkFromGroup(groupId);
-      toast.success("Has dejado el grupo exitosamente");
-      router.refresh();
-      router.push("/");
-    } catch (error: unknown) {
-      const errorMessage = (error as Error).message || "Error desconocido al desvincular del grupo";
-      toast.error(errorMessage);
-    } finally {
-      setDeletingGroup(false);
-      setShowDeleteDialog(false);
+  const handleDeleteGroup = () => {
+    setShowDeleteDialog(true);
+  };
+
+  const handleCopyInviteCode = () => {
+    if (inviteCode) {
+      navigator.clipboard.writeText(inviteCode);
+      toast.success("Código de invitación copiado al portapapeles");
     }
   };
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">Miembros del Grupo</h3>
-        <div className="flex gap-2">
-          <Button onClick={() => setShowInviteDialog(true)} size="sm">
-            <UserPlus className="w-4 h-4 mr-2" />
-            Invitar
-          </Button>
-          {userRole === "admin" && (
-            <Button onClick={() => setShowDeleteDialog(true)} variant="destructive" size="sm">
-              <LogOut className="w-4 h-4 mr-2" />
-              Dejar Grupo
-            </Button>
-          )}
-          <Button onClick={() => setShowLeaveDialog(true)} variant="outline" size="sm">
-            <LogOut className="w-4 h-4 mr-2" />
-            Salir
-          </Button>
-        </div>
-      </div>
+      <h1>Miembros del Grupo: {groupName}</h1>
+      <Button onClick={handleInvite}>
+        <UserPlus /> Invitar Miembro
+      </Button>
+      <Button onClick={handleLeaveGroup}>
+        <LogOut /> Salir del Grupo
+      </Button>
+      <Button onClick={handleDeleteGroup}>
+        <LogOut /> Eliminar Grupo
+      </Button>
 
-      <div className="space-y-4">
+      <div>
         {members.map((member) => (
-          <div key={member.user_id} className="flex items-center gap-3 p-2 rounded-lg bg-muted/50">
+          <div key={member.user_id}>
             <Avatar>
-              <AvatarImage src={member.profiles?.avatar_url || undefined} />
-              <AvatarFallback>
-                {member.profiles?.name
-                  ?.split(" ")
-                  .map((n) => n[0])
-                  .join("") || "SN"}
-              </AvatarFallback>
+              <AvatarImage src={member.profiles.avatar_url || "/default-avatar.png"} alt={member.profiles.name} />
+              <AvatarFallback>{member.profiles.name.charAt(0)}</AvatarFallback>
             </Avatar>
-            <div>
-              <p className="font-medium">{member.profiles?.name}</p>
-              <p className="text-sm text-muted-foreground capitalize">{member.role}</p>
-            </div>
+            <p>{member.profiles.name}</p>
+            <p>{member.role}</p>
           </div>
         ))}
       </div>
 
+      {/* Dialogos de confirmación */}
       <Dialog open={showInviteDialog} onOpenChange={setShowInviteDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Invitar Miembros</DialogTitle>
+            <DialogTitle>Invitar Miembro</DialogTitle>
             <DialogDescription>
-              Comparte este enlace para invitar personas a unirse a {groupName}
+              Introduce el correo electrónico o ID del miembro que quieres invitar.
             </DialogDescription>
           </DialogHeader>
-          <div className="flex gap-2 mt-4">
-            <Input
-              readOnly
-              value={`${window.location.origin}/join/${inviteCode}`}
-            />
-            <Button onClick={copyInviteLink} variant="outline">
-              <Copy className="w-4 h-4" />
+          <Input />
+          <DialogFooter>
+            <Button>Invitar</Button>
+            <Button variant="outline" onClick={() => setShowInviteDialog(false)}>
+              Cancelar
             </Button>
-          </div>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
       <Dialog open={showLeaveDialog} onOpenChange={setShowLeaveDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Salir del Grupo</DialogTitle>
+            <DialogTitle>Confirmar salida del grupo</DialogTitle>
             <DialogDescription>
-              ¿Estás seguro que deseas salir de {groupName}? Esta acción no se puede deshacer.
+              ¿Estás seguro de que quieres salir de este grupo?
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button
-              variant="outline"
-              onClick={() => setShowLeaveDialog(false)}
-              disabled={leavingGroup}
+              onClick={async () => {
+                setLeavingGroup(true);
+                try {
+                  // Lógica para salir del grupo
+                  await dbService.leaveGroup(groupId);
+                  router.push("/groups");
+                } catch (error) {
+                  console.error("Error al salir del grupo", error);
+                } finally {
+                  setLeavingGroup(false);
+                  setShowLeaveDialog(false);
+                }
+              }}
             >
-              Cancelar
+              {leavingGroup ? "Saliendo..." : "Sí, salir"}
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleLeaveGroup}
-              disabled={leavingGroup}
-            >
-              {leavingGroup ? "Saliendo..." : "Salir del Grupo"}
+            <Button variant="outline" onClick={() => setShowLeaveDialog(false)}>
+              Cancelar
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -205,26 +186,31 @@ export function GroupMembers({ groupId, groupName, inviteCode }: GroupMembersPro
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Dejar Grupo</DialogTitle>
+            <DialogTitle>Confirmar eliminación del grupo</DialogTitle>
             <DialogDescription>
-              ¿Estás seguro que deseas dejar el grupo {groupName}? 
-              Podrás volver a unirte si tienes un código de invitación.
+              ¿Estás seguro de que quieres eliminar este grupo permanentemente?
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button
-              variant="outline"
-              onClick={() => setShowDeleteDialog(false)}
-              disabled={deletingGroup}
+              onClick={async () => {
+                setDeletingGroup(true);
+                try {
+                  // Lógica para eliminar el grupo
+                  await dbService.deleteGroup(groupId);
+                  router.push("/groups");
+                } catch (error) {
+                  console.error("Error al eliminar el grupo", error);
+                } finally {
+                  setDeletingGroup(false);
+                  setShowDeleteDialog(false);
+                }
+              }}
             >
-              Cancelar
+              {deletingGroup ? "Eliminando..." : "Sí, eliminar"}
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleUnlinkGroup}
-              disabled={deletingGroup}
-            >
-              {deletingGroup ? "Saliendo..." : "Dejar Grupo"}
+            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
+              Cancelar
             </Button>
           </DialogFooter>
         </DialogContent>
