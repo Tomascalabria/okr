@@ -46,32 +46,31 @@ export function GroupMembers({ groupId, groupName, inviteCode }: GroupMembersPro
 
   useEffect(() => {
     const loadData = async () => {
-      try {
-        const [membersData, roleData] = await Promise.all([
-          dbService.getGroupMembers(groupId),
-          dbService.getUserRole(groupId),
-        ]);
+  try {
+    const [membersData, roleData] = await Promise.all([
+      dbService.getGroupMembers(groupId), // Asegúrate de que el servicio devuelve datos con el tipo correcto
+      dbService.getUserRole(groupId),
+    ]);
 
-        // Formatear datos
-        const formattedMembersData = membersData.map((member: any) => {
-          // Manejar perfiles anidados
-          const profileData = member.profiles || {};
-          return {
-            user_id: member.user_id,
-            role: member.role,
-            profiles: {
-              name: profileData.name || "Sin Nombre",
-              avatar_url: profileData.avatar_url || null,
-            },
-          };
-        });
+    const formattedMembersData = membersData.map((member: MemberData) => {
+      const profileData = member.profiles || { name: "Sin Nombre", avatar_url: null };
 
-        setMembers(formattedMembersData);
-        setUserRole(roleData);
-      } catch (error) {
-        console.error("Error loading data:", error);
-      }
-    };
+      return {
+        user_id: member.user_id,
+        role: member.role,
+        profiles: {
+          name: profileData.name,
+          avatar_url: profileData.avatar_url,
+        },
+      };
+    });
+
+    setMembers(formattedMembersData);
+    setUserRole(roleData);
+  } catch (error) {
+    console.error("Error loading data:", error);
+  }
+};
 
     loadData();
   }, [groupId]);
