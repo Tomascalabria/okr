@@ -60,23 +60,22 @@ console.log(membersData)
 interface MemberData {
   user_id: string;
   role: string;
-  profiles: MemberProfile;
+  profiles: { name: string; avatar_url: string | null } | null;
 }
 
-const formattedMembersData = membersData.map((member: MemberData) => {
-  const profiles = Array.isArray(member.profiles)
-    ? member.profiles[0]
-    : member.profiles;
+const formattedMembersData = membersData.map((member: any) => {
+  const profiles = Array.isArray(member.profiles) ? member.profiles[0] : member.profiles;
 
   return {
     user_id: member.user_id,
     role: member.role,
     profiles: {
-      name: profiles?.name ,
-      avatar_url: profiles?.avatar_url ,
+      name: profiles?.name || "Sin Nombre",
+      avatar_url: profiles?.avatar_url || null,
     },
   };
 });
+
                 setMembers(formattedMembersData)
         setUserRole(roleData)
       } catch (error) {
