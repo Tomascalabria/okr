@@ -51,44 +51,50 @@ export function GroupMembers({ groupId, groupName, inviteCode }: GroupMembersPro
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deletingGroup, setDeletingGroup] = useState(false);
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const [membersData, roleData] = await Promise.all([
-          dbService.getGroupMembers(groupId), // Asegúrate de que el servicio devuelve datos con el tipo correcto
-          dbService.getUserRole(groupId),
-        ]);
+useEffect(() => {
+  const loadData = async () => {
+    try {
+      const [membersData, roleData] = await Promise.all([
+        dbService.getGroupMembers(groupId), // Esta función devuelve los datos correctamente
+        dbService.getUserRole(groupId),
+      ]);
 
-        // Validar que membersData tiene el formato correcto
-        if (Array.isArray(membersData)) {
-          const formattedMembersData = membersData.map((member: GroupMember) => {
-            const profileData = member.profiles || { name: "Sin Nombre", avatar_url: null };
-            return {
-              user_id: member.user_id,
-              role: member.role,
-              profiles: {
-                name: profileData.name,
-                avatar_url: profileData.avatar_url,
-              },
-            };
-          });
+      // Verifica la estructura de los datos antes de procesarlos
+      if (Array.isArray(membersData)) {
+        // Log para ver la estructura de los datos
+        console.log(membersData);
 
-          setMembers(formattedMembersData);
-        } else {
-          console.error("Los datos de los miembros no tienen el formato esperado", membersData);
-        }
+        // Mapea los miembros a un formato adecuado
+        const formattedMembersData = membersData.map((member) => {
+          // Asegúrate de que los perfiles tengan datos, si no, usa valores por defecto
+          const profileData = member.profiles || { name: "Sin Nombre", avatar_url: null };
+          
+          return {
+            user_id: member.user_id,
+            role: member.role,
+            profiles: {
+              name: profileData.name,
+              avatar_url: profileData.avatar_url,
+            },
+          };
+        });
 
-        // Establecer el rol del usuario
-        setUserRole(roleData);
-
-      } catch (error) {
-        console.error("Error cargando los datos del grupo", error);
+        // Actualiza el estado con los miembros formateados
+        setMembers(formattedMembersData);
+      } else {
+        console.error("Los datos de los miembros no tienen el formato esperado", membersData);
       }
-    };
 
-    loadData();
-  }, [groupId]);
+      // Establecer el rol del usuario
+      setUserRole(roleData);
 
+    } catch (error) {
+      console.error("Error cargando los datos del grupo", error);
+    }
+  };
+
+  loadData();
+}, [groupId]);
   const handleInvite = () => {
     setShowInviteDialog(true);
   };
