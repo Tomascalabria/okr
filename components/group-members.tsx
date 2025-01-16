@@ -51,19 +51,14 @@ export function GroupMembers({ groupId, groupName, inviteCode }: GroupMembersPro
           dbService.getUserRole(groupId)
       
         ])
-console.log(membersData)
-   interface MemberProfile {
-  name: string;
-  avatar_url: string | null;
-}
+
 
 interface MemberData {
   user_id: string;
   role: string;
   profiles: { name: string; avatar_url: string | null } | null;
 }
-
-const formattedMembersData = membersData.map((member: any) => {
+const formattedMembersData = membersData.map((member: MemberData) => {
   const profiles = Array.isArray(member.profiles) ? member.profiles[0] : member.profiles;
 
   return {
@@ -75,6 +70,8 @@ const formattedMembersData = membersData.map((member: any) => {
     },
   };
 });
+
+console.log("Members data before formatting:", membersData); // Para depuración
 
                 setMembers(formattedMembersData)
         setUserRole(roleData)
