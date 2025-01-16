@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -10,116 +10,109 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { toast } from "sonner"
-import { dbService } from "@/lib/db-service"
-import { Copy, UserPlus, LogOut } from "lucide-react"
-import { useRouter } from "next/navigation"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import { dbService } from "@/lib/db-service";
+import { Copy, UserPlus, LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
+
+interface Profile {
+  name: string;
+  avatar_url: string | null;
+}
 
 interface GroupMember {
-  user_id: string
-  role: string
-  profiles: {
-    name: string
-    avatar_url: string | null
-  }
+  user_id: string;
+  role: string;
+  profiles: Profile | null; // Asegurar que el tipo coincida con la estructura esperada
 }
 
 interface GroupMembersProps {
-  groupId: string
-  groupName: string
-  inviteCode?: string
+  groupId: string;
+  groupName: string;
+  inviteCode?: string;
 }
 
 export function GroupMembers({ groupId, groupName, inviteCode }: GroupMembersProps) {
-  const router = useRouter()
-  const [members, setMembers] = useState<GroupMember[]>([])
-  const [showInviteDialog, setShowInviteDialog] = useState(false)
-  const [showLeaveDialog, setShowLeaveDialog] = useState(false)
-  const [leavingGroup, setLeavingGroup] = useState(false)
-  const [userRole, setUserRole] = useState<'admin' | 'member' | null>(null)
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-  const [deletingGroup, setDeletingGroup] = useState(false)
+  const router = useRouter();
+  const [members, setMembers] = useState<GroupMember[]>([]);
+  const [showInviteDialog, setShowInviteDialog] = useState(false);
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+  const [leavingGroup, setLeavingGroup] = useState(false);
+  const [userRole, setUserRole] = useState<"admin" | "member" | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deletingGroup, setDeletingGroup] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-            
         const [membersData, roleData] = await Promise.all([
-          dbService.getGroupMembers(groupId), 
-          dbService.getUserRole(groupId)
-      
-        ])
+          dbService.getGroupMembers(groupId),
+          dbService.getUserRole(groupId),
+        ]);
 
+        // Formatear datos
+        const formattedMembersData = membersData.map((member: any) => {
+          // Manejar perfiles anidados
+          const profileData = member.profiles || {};
+          return {
+            user_id: member.user_id,
+            role: member.role,
+            profiles: {
+              name: profileData.name || "Sin Nombre",
+              avatar_url: profileData.avatar_url || null,
+            },
+          };
+        });
 
-interface MemberData {
-  user_id: string;
-  role: string;
-  profiles: { name: string; avatar_url: string | null } | null;
-}
-const formattedMembersData = membersData.map((member: MemberData) => {
-  const profiles = Array.isArray(member.profiles) ? member.profiles[0] : member.profiles;
-
-  return {
-    user_id: member.user_id,
-    role: member.role,
-    profiles: {
-      name: profiles?.name || "Sin Nombre",
-      avatar_url: profiles?.avatar_url || null,
-    },
-  };
-});
-
-console.log("Members data before formatting:", membersData); // Para depuración
-
-                setMembers(formattedMembersData)
-        setUserRole(roleData)
+        setMembers(formattedMembersData);
+        setUserRole(roleData);
       } catch (error) {
-        console.error("Error loading data:", error)
+        console.error("Error loading data:", error);
       }
-    }
+    };
 
-    loadData()
-  }, [groupId])
+    loadData();
+  }, [groupId]);
 
   const copyInviteLink = () => {
-    const link = `${window.location.origin}/join/${inviteCode}`
-    navigator.clipboard.writeText(link)
-    toast.success("Enlace de invitación copiado!")
-  }
+    const link = `${window.location.origin}/join/${inviteCode}`;
+    navigator.clipboard.writeText(link);
+    toast.success("Enlace de invitación copiado!");
+  };
 
   const handleLeaveGroup = async () => {
     try {
-      setLeavingGroup(true)
-      await dbService.leaveGroup(groupId)
-      toast.success("Has salido del grupo exitosamente")
-      router.refresh()
-      router.push("/")
+      setLeavingGroup(true);
+      await dbService.leaveGroup(groupId);
+      toast.success("Has salido del grupo exitosamente");
+      router.refresh();
+      router.push("/");
     } catch (error: unknown) {
-      const errorMessage = (error as Error).message || "Error desconocido al salir del grupo"
-      toast.error(errorMessage)
+      const errorMessage = (error as Error).message || "Error desconocido al salir del grupo";
+      toast.error(errorMessage);
     } finally {
-      setLeavingGroup(false)
-      setShowLeaveDialog(false)
+      setLeavingGroup(false);
+      setShowLeaveDialog(false);
     }
-  }
+  };
 
   const handleUnlinkGroup = async () => {
     try {
-      setDeletingGroup(true)
-      await dbService.unlinkFromGroup(groupId)
-      toast.success("Has dejado el grupo exitosamente")
-      router.refresh()
-      router.push("/")
+      setDeletingGroup(true);
+      await dbService.unlinkFromGroup(groupId);
+      toast.success("Has dejado el grupo exitosamente");
+      router.refresh();
+      router.push("/");
     } catch (error: unknown) {
-      const errorMessage = (error as Error).message || "Error desconocido al desvincular del grupo"
-      toast.error(errorMessage)
+      const errorMessage = (error as Error).message || "Error desconocido al desvincular del grupo";
+      toast.error(errorMessage);
     } finally {
-      setDeletingGroup(false)
-      setShowDeleteDialog(false)
+      setDeletingGroup(false);
+      setShowDeleteDialog(false);
     }
-  }
+  };
 
   return (
     <div>
@@ -130,21 +123,13 @@ console.log("Members data before formatting:", membersData); // Para depuración
             <UserPlus className="w-4 h-4 mr-2" />
             Invitar
           </Button>
-          {userRole === 'admin' && (
-            <Button 
-              onClick={() => setShowDeleteDialog(true)}
-              variant="destructive" 
-              size="sm"
-            >
+          {userRole === "admin" && (
+            <Button onClick={() => setShowDeleteDialog(true)} variant="destructive" size="sm">
               <LogOut className="w-4 h-4 mr-2" />
               Dejar Grupo
             </Button>
           )}
-          <Button 
-            onClick={() => setShowLeaveDialog(true)} 
-            variant="outline" 
-            size="sm"
-          >
+          <Button onClick={() => setShowLeaveDialog(true)} variant="outline" size="sm">
             <LogOut className="w-4 h-4 mr-2" />
             Salir
           </Button>
@@ -155,18 +140,22 @@ console.log("Members data before formatting:", membersData); // Para depuración
         {members.map((member) => (
           <div key={member.user_id} className="flex items-center gap-3 p-2 rounded-lg bg-muted/50">
             <Avatar>
-              <AvatarImage src={member.profiles.avatar_url || undefined} />
+              <AvatarImage src={member.profiles?.avatar_url || undefined} />
               <AvatarFallback>
-                {member.profiles.name.split(" ").map(n => n[0]).join("")}
+                {member.profiles?.name
+                  ?.split(" ")
+                  .map((n) => n[0])
+                  .join("") || "SN"}
               </AvatarFallback>
             </Avatar>
             <div>
-              <p className="font-medium">{member.profiles.name}</p>
+              <p className="font-medium">{member.profiles?.name}</p>
               <p className="text-sm text-muted-foreground capitalize">{member.role}</p>
             </div>
           </div>
         ))}
       </div>
+
 
       <Dialog open={showInviteDialog} onOpenChange={setShowInviteDialog}>
         <DialogContent>
