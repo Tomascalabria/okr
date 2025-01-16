@@ -54,40 +54,26 @@ export function GroupMembers({ groupId, groupName, inviteCode }: GroupMembersPro
 useEffect(() => {
   const loadData = async () => {
     try {
-      const [membersData, roleData] = await Promise.all([
-        dbService.getGroupMembers(groupId), // Esta función devuelve los datos correctamente
-        dbService.getUserRole(groupId),
-      ]);
+      const membersData = await dbService.getGroupMembers(groupId);
 
-      // Verifica la estructura de los datos antes de procesarlos
+      // Verificar que la respuesta sea un array
       if (Array.isArray(membersData)) {
-        // Log para ver la estructura de los datos
-        console.log(membersData);
-
-        // Mapea los miembros a un formato adecuado
+        // Mapea los miembros con sus perfiles, asegurándote de que 'profiles' exista
         const formattedMembersData = membersData.map((member) => {
-          // Asegúrate de que los perfiles tengan datos, si no, usa valores por defecto
-          const profileData = member.profiles || { name: "Sin Nombre", avatar_url: null };
-          
+          // Verifica si 'profiles' existe y asigna un valor predeterminado si es necesario
+          const profileData = member.profiles ? member.profiles : { name: "Sin Nombre", avatar_url: null };
+
           return {
             user_id: member.user_id,
             role: member.role,
-            profiles: {
-              name: profileData.name,
-              avatar_url: profileData.avatar_url,
-            },
+            profile: profileData, // Asigna el perfil correctamente
           };
         });
 
-        // Actualiza el estado con los miembros formateados
         setMembers(formattedMembersData);
       } else {
         console.error("Los datos de los miembros no tienen el formato esperado", membersData);
       }
-
-      // Establecer el rol del usuario
-      setUserRole(roleData);
-
     } catch (error) {
       console.error("Error cargando los datos del grupo", error);
     }
@@ -95,6 +81,8 @@ useEffect(() => {
 
   loadData();
 }, [groupId]);
+
+  
   const handleInvite = () => {
     setShowInviteDialog(true);
   };
