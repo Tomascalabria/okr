@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { dbService } from "@/lib/db-service";
-import { Copy, UserPlus, LogOut } from "lucide-react";
+import {  UserPlus, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 // Interfaces de tipo actualizadas según la estructura de los datos
@@ -30,8 +30,8 @@ interface Profile {
 interface GroupMember {
   group_id: string;
   user_id: string;
-  role: string;
   created_at: string;
+  role: string;
   profiles: Profile;
 }
 
@@ -51,38 +51,38 @@ export function GroupMembers({ groupId, groupName, inviteCode }: GroupMembersPro
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deletingGroup, setDeletingGroup] = useState(false);
 
-useEffect(() => {
-  const loadData = async () => {
-    try {
-      const membersData = await dbService.getGroupMembers(groupId);
 
-      // Verificar que la respuesta sea un array
-      if (Array.isArray(membersData)) {
-        // Mapea los miembros con sus perfiles, asegurándote de que 'profiles' exista
-        const formattedMembersData = membersData.map((member) => {
-          // Verifica si 'profiles' existe y asigna un valor predeterminado si es necesario
-          const profileData = member.profile
-
-          return {
-            user_id: member.user_id,
-            role: member.role,
-            profile: profileData, // Asigna el perfil correctamente
-          };
-        });
-
-        setMembers(formattedMembersData);
-      } else {
-        console.error("Los datos de los miembros no tienen el formato esperado", membersData);
-      }
-    } catch (error) {
-      console.error("Error cargando los datos del grupo", error);
-    }
-  };
-
-  loadData();
-}, [groupId]);
-
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const membersData = await dbService.getGroupMembers(groupId);
   
+        if (Array.isArray(membersData)) {
+          const formattedMembersData = membersData.map((member) => ({
+            group_id: groupId,
+            user_id: member.user_id,
+            created_at: member.created_at,
+            role: member.role,
+            profiles: {
+              id: member.profiles[0].id,
+              name: member.profiles[0].name,
+              avatar_url: member.profiles[0].avatar_url,
+            }, // Ensure profiles is an object
+          }));
+  
+          setMembers(formattedMembersData);
+        } else {
+          console.error("Los datos de los miembros no tienen el formato esperado", membersData);
+        }
+      } catch (error) {
+        console.error("Error cargando los datos del grupo", error);
+      }
+    };
+  
+    loadData();
+  }, [groupId]);
+  
+
   const handleInvite = () => {
     setShowInviteDialog(true);
   };
@@ -194,7 +194,7 @@ useEffect(() => {
                 setDeletingGroup(true);
                 try {
                   // Lógica para eliminar el grupo
-                  await dbService.deleteGroup(groupId);
+                  await dbService.leaveGroup(groupId);
                   router.push("/groups");
                 } catch (error) {
                   console.error("Error al eliminar el grupo", error);
