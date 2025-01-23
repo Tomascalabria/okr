@@ -53,7 +53,7 @@ export function GroupCard({ group, isActive, onClick }: GroupCardProps) {
       await dbService.leaveGroup(group.id)
       toast.success(`Has salido del grupo ${group.name}`)
       router.refresh()
-      router.push("/")
+      router.push("/hero")
     } catch (error: unknown) {
       if (error instanceof Error) {
         toast.error(error.message)
