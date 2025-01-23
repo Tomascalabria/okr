@@ -35,7 +35,7 @@ export default function JoinGroupPage({ params }: { params: { code: string } }) 
           console.error("An unknown error occurred");
           toast.error("Ha ocurrido un error inesperado.");
         }
-        router.push("/");
+        router.push("/hero");
       }
       
     };

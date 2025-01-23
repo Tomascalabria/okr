@@ -42,8 +42,8 @@ export function RegisterForm({
 
     try {
       await authService.signUp(email, password, name)
-      toast.success("¡Registro exitoso! Bienvenido.")
-      router.push("/")
+      toast.success("Revisa tu mail para confirmar el registro!!.")
+      router.push("/auth/login")
       router.refresh()
     } catch (error: unknown) {
       // Verificar si el error es una instancia de Error
